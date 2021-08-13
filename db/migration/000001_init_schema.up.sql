@@ -86,8 +86,6 @@ ALTER TABLE "follow" ADD FOREIGN KEY ("following_id") REFERENCES "users" ("id");
 
 ALTER TABLE "follow" ADD FOREIGN KEY ("follower_id") REFERENCES "users" ("id");
 
-ALTER TABLE "accounts" ADD FOREIGN KEY ("owner") REFERENCES "users" ("username");
-
 ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 
 ALTER TABLE "transfers" ADD FOREIGN KEY ("from_account_id") REFERENCES "accounts" ("id");
