@@ -31,6 +31,8 @@ func (server *Server) setupRouter() {
 	router.GET	("/accounts/:id", server.getAccount)
 	router.GET	("/accounts", server.listAccount)
 
+	router.POST("/transfers", server.createTransfer)
+
 	server.router = router
 }
 
