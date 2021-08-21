@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -38,4 +39,7 @@ func RandomOwner() string {
 // RandomMoney generates a random amount of money
 func RandomMoney() int64 {
 	return RandomInt(0, 1000)
+}
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
 }
