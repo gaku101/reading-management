@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -15,11 +14,11 @@ RETURNING id, username, hashed_password, email, profile, image, password_changed
 `
 
 type CreateUserParams struct {
-	Username       string         `json:"username"`
-	HashedPassword string         `json:"hashed_password"`
-	Email          string         `json:"email"`
-	Profile        sql.NullString `json:"profile"`
-	Image          sql.NullString `json:"image"`
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	Email          string `json:"email"`
+	Profile        string `json:"profile"`
+	Image          string `json:"image"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
