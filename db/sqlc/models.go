@@ -3,7 +3,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -41,12 +40,12 @@ type Follow struct {
 }
 
 type Post struct {
-	ID        int64          `json:"id"`
-	Author    string         `json:"author"`
-	Title     string         `json:"title"`
-	Body      sql.NullString `json:"body"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
+	ID        int64     `json:"id"`
+	Author    string    `json:"author"`
+	Title     string    `json:"title"`
+	Body      string    `json:"body"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type PostCategory struct {
@@ -71,12 +70,12 @@ type Transfer struct {
 }
 
 type User struct {
-	ID                int64          `json:"id"`
-	Username          string         `json:"username"`
-	HashedPassword    string         `json:"hashed_password"`
-	Email             string         `json:"email"`
-	Profile           sql.NullString `json:"profile"`
-	Image             sql.NullString `json:"image"`
-	PasswordChangedAt time.Time      `json:"password_changed_at"`
-	CreatedAt         time.Time      `json:"created_at"`
+	ID                int64     `json:"id"`
+	Username          string    `json:"username"`
+	HashedPassword    string    `json:"hashed_password"`
+	Email             string    `json:"email"`
+	Profile           string    `json:"profile"`
+	Image             string    `json:"image"`
+	PasswordChangedAt time.Time `json:"password_changed_at"`
+	CreatedAt         time.Time `json:"created_at"`
 }
