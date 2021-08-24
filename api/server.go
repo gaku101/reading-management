@@ -1,22 +1,36 @@
 package api
 
 import (
+	"fmt"
+
 	db "github.com/gaku101/my-portfolio/db/sqlc"
+	"github.com/gaku101/my-portfolio/token"
+	"github.com/gaku101/my-portfolio/util"
 	"github.com/gin-gonic/gin"
 )
 
 // Server serves HTTP requests for our banking service
 type Server struct {
-	store  db.Store
-	router *gin.Engine
+	config     util.Config
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
 // New Server creates a new HTTP server and setup routing
-func NewServer(store db.Store) *Server {
-	server := &Server{store: store}
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
 
 	server.setupRouter()
-	return server
+	return server, nil
 }
 
 // Start runs the HTTP server on a specific address
@@ -28,10 +42,11 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.POST("/users", server.createUser)
+	router.POST("/users/login", server.loginUser)
 
 	router.POST("/accounts", server.createAccount)
-	router.GET	("/accounts/:id", server.getAccount)
-	router.GET	("/accounts", server.listAccount)
+	router.GET("/accounts/:id", server.getAccount)
+	router.GET("/accounts", server.listAccount)
 
 	router.POST("/transfers", server.createTransfer)
 
