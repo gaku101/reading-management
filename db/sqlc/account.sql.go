@@ -103,46 +103,6 @@ func (q *Queries) GetAccountForUodate(ctx context.Context, id int64) (Account, e
 	return i, err
 }
 
-const listAccounts = `-- name: ListAccounts :many
-SELECT id, owner, balance, created_at
-FROM accounts
-ORDER BY id
-LIMIT $1 OFFSET $2
-`
-
-type ListAccountsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, listAccounts, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Account{}
-	for rows.Next() {
-		var i Account
-		if err := rows.Scan(
-			&i.ID,
-			&i.Owner,
-			&i.Balance,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updateAccount = `-- name: UpdateAccount :one
 UPDATE accounts
 SET balance = $2
