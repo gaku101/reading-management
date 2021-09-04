@@ -20,6 +20,7 @@ type createUserRequest struct {
 }
 
 type userResponse struct {
+	Id                int64     `json:"id"`
 	Username          string    `json:"username"`
 	Email             string    `json:"email"`
 	Profile           string    `json:"profile"`
@@ -30,10 +31,11 @@ type userResponse struct {
 
 func newUserResponse(user db.User) userResponse {
 	return userResponse{
+		Id: user.ID,
 		Username:          user.Username,
 		Email:             user.Email,
-		Profile: user.Profile,
-		Image: user.Image,
+		Profile:           user.Profile,
+		Image:             user.Image,
 		PasswordChangedAt: user.PasswordChangedAt,
 		CreatedAt:         user.CreatedAt,
 	}
@@ -76,6 +78,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 	rsp := newUserResponse(user)
 	ctx.JSON(http.StatusOK, rsp)
 }
+
 type loginUserRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Password string `json:"password" binding:"required,min=6"`
@@ -121,6 +124,37 @@ func (server *Server) loginUser(ctx *gin.Context) {
 	rsp := loginUserResponse{
 		AccessToken: accessToken,
 		User:        newUserResponse(user),
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type getUserRequest struct {
+	Username string `uri:"username" binding:"required,alphanum"`
+}
+
+type getUserResponse struct {
+	User userResponse `json:"user"`
+}
+
+func (server *Server) getUser(ctx *gin.Context) {
+	var req getUserRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := getUserResponse{
+		User: newUserResponse(user),
 	}
 	ctx.JSON(http.StatusOK, rsp)
 }
