@@ -7,7 +7,7 @@ SELECT *
 FROM accounts
 WHERE id = $1
 LIMIT 1;
--- name: GetAccountForUodate :one
+-- name: GetAccountForUpdate :one
 SELECT *
 FROM accounts
 WHERE id = $1

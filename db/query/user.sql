@@ -7,3 +7,10 @@ SELECT *
 FROM users
 WHERE username = $1
 LIMIT 1;
+-- name: UpdateUser :one
+UPDATE users
+SET username = $2,
+  profile = $3,
+  image = $4
+WHERE id = $1
+RETURNING *;
