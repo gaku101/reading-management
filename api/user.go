@@ -31,7 +31,7 @@ type userResponse struct {
 
 func newUserResponse(user db.User) userResponse {
 	return userResponse{
-		Id: user.ID,
+		Id:                user.ID,
 		Username:          user.Username,
 		Email:             user.Email,
 		Profile:           user.Profile,
@@ -156,5 +156,38 @@ func (server *Server) getUser(ctx *gin.Context) {
 	rsp := getUserResponse{
 		User: newUserResponse(user),
 	}
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type updateUserRequest struct {
+	ID       int64  `json:"id" binding:"required,min=1"`
+	Username string `json:"username" binding:"required,alphanum"`
+	Profile  string `json:"profile"`
+	Image    string `json:"image"`
+}
+
+func (server *Server) updateUser(ctx *gin.Context) {
+	var req updateUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateUserParams{
+		ID:       req.ID,
+		Username: req.Username,
+		Profile:  req.Profile,
+		Image:    req.Image,
+	}
+
+	user, err := server.store.UpdateUser(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	rsp := getUserResponse{
+		User: newUserResponse(user),
+	}
+
 	ctx.JSON(http.StatusOK, rsp)
 }
