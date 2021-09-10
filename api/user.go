@@ -2,10 +2,12 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"time"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
+	"github.com/gaku101/my-portfolio/token"
 	"github.com/gaku101/my-portfolio/util"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -173,6 +175,18 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		return
 	}
 
+	user, valid := server.validUser(ctx, req.Username)
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("Not allowed to update other user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	arg := db.UpdateUserParams{
 		ID:       req.ID,
 		Username: req.Username,
@@ -190,4 +204,19 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) validUser(ctx *gin.Context, username string) (db.User, bool) {
+	user, err := server.store.GetUser(ctx, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return user, false
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return user, false
+	}
+
+	return user, true
 }
