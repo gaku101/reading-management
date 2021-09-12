@@ -68,7 +68,7 @@ func (server *Server) getPost(ctx *gin.Context) {
 		return
 	}
 
-	account, err := server.store.GetPost(ctx, req.ID)
+	post, err := server.store.GetPost(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -78,5 +78,33 @@ func (server *Server) getPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, account)
+	ctx.JSON(http.StatusOK, post)
+}
+
+type listPostRequest struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+func (server *Server) listPosts(ctx *gin.Context) {
+	var req listPostRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	arg := db.ListPostsParams{
+		Author: authPayload.Username,
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	}
+
+	accounts, err := server.store.ListPosts(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, accounts)
 }
