@@ -32,3 +32,68 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	)
 	return i, err
 }
+
+const getPost = `-- name: GetPost :one
+SELECT id, author, title, body, created_at, updated_at
+FROM posts
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
+	row := q.db.QueryRowContext(ctx, getPost, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Author,
+		&i.Title,
+		&i.Body,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const listPosts = `-- name: ListPosts :many
+SELECT id, author, title, body, created_at, updated_at
+FROM posts
+WHERE author = $1
+ORDER BY id
+LIMIT $2 OFFSET $3
+`
+
+type ListPostsParams struct {
+	Author string `json:"author"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
+}
+
+func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, listPosts, arg.Author, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Author,
+			&i.Title,
+			&i.Body,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
