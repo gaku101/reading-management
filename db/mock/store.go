@@ -65,6 +65,21 @@ func (mr *MockStoreMockRecorder) CreateAccount(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockStore)(nil).CreateAccount), arg0, arg1)
 }
 
+// CreateCategory mocks base method.
+func (m *MockStore) CreateCategory(arg0 context.Context, arg1 string) (db.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateCategory indicates an expected call of CreateCategory.
+func (mr *MockStoreMockRecorder) CreateCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCategory", reflect.TypeOf((*MockStore)(nil).CreateCategory), arg0, arg1)
+}
+
 // CreateEntry mocks base method.
 func (m *MockStore) CreateEntry(arg0 context.Context, arg1 db.CreateEntryParams) (db.Entry, error) {
 	m.ctrl.T.Helper()

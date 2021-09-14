@@ -58,6 +58,8 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/posts/:id", server.getPost)
 	authRoutes.GET("/posts", server.listPosts)
 
+	authRoutes.POST("/category", server.createCategory)
+
 	server.router = router
 }
 
