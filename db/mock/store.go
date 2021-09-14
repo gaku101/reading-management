@@ -65,6 +65,21 @@ func (mr *MockStoreMockRecorder) CreateAccount(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockStore)(nil).CreateAccount), arg0, arg1)
 }
 
+// CreateCategory mocks base method.
+func (m *MockStore) CreateCategory(arg0 context.Context, arg1 string) (db.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateCategory indicates an expected call of CreateCategory.
+func (mr *MockStoreMockRecorder) CreateCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCategory", reflect.TypeOf((*MockStore)(nil).CreateCategory), arg0, arg1)
+}
+
 // CreateEntry mocks base method.
 func (m *MockStore) CreateEntry(arg0 context.Context, arg1 db.CreateEntryParams) (db.Entry, error) {
 	m.ctrl.T.Helper()
@@ -93,6 +108,21 @@ func (m *MockStore) CreatePost(arg0 context.Context, arg1 db.CreatePostParams) (
 func (mr *MockStoreMockRecorder) CreatePost(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePost", reflect.TypeOf((*MockStore)(nil).CreatePost), arg0, arg1)
+}
+
+// CreatePostCategory mocks base method.
+func (m *MockStore) CreatePostCategory(arg0 context.Context, arg1 db.CreatePostCategoryParams) (db.PostCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePostCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.PostCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePostCategory indicates an expected call of CreatePostCategory.
+func (mr *MockStoreMockRecorder) CreatePostCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePostCategory", reflect.TypeOf((*MockStore)(nil).CreatePostCategory), arg0, arg1)
 }
 
 // CreateTransfer mocks base method.
@@ -169,6 +199,21 @@ func (mr *MockStoreMockRecorder) GetAccountForUpdate(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountForUpdate", reflect.TypeOf((*MockStore)(nil).GetAccountForUpdate), arg0, arg1)
 }
 
+// GetCategory mocks base method.
+func (m *MockStore) GetCategory(arg0 context.Context, arg1 int64) (db.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCategory indicates an expected call of GetCategory.
+func (mr *MockStoreMockRecorder) GetCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCategory", reflect.TypeOf((*MockStore)(nil).GetCategory), arg0, arg1)
+}
+
 // GetEntry mocks base method.
 func (m *MockStore) GetEntry(arg0 context.Context, arg1 int64) (db.Entry, error) {
 	m.ctrl.T.Helper()
@@ -197,6 +242,21 @@ func (m *MockStore) GetPost(arg0 context.Context, arg1 int64) (db.Post, error) {
 func (mr *MockStoreMockRecorder) GetPost(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPost", reflect.TypeOf((*MockStore)(nil).GetPost), arg0, arg1)
+}
+
+// GetPostCategory mocks base method.
+func (m *MockStore) GetPostCategory(arg0 context.Context, arg1 int64) (db.PostCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPostCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.PostCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPostCategory indicates an expected call of GetPostCategory.
+func (mr *MockStoreMockRecorder) GetPostCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostCategory", reflect.TypeOf((*MockStore)(nil).GetPostCategory), arg0, arg1)
 }
 
 // GetTransfer mocks base method.
