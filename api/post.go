@@ -3,7 +3,9 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
+	"time"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
 	"github.com/gaku101/my-portfolio/token"
@@ -12,9 +14,31 @@ import (
 )
 
 type createPostRequest struct {
-	Author string `json:"author" binding:"required,alphanum"`
-	Title  string `json:"title" binding:"required"`
-	Body   string `json:"body" binding:"required"`
+	Author   string `json:"author" binding:"required,alphanum"`
+	Title    string `json:"title" binding:"required"`
+	Body     string `json:"body" binding:"required"`
+	Category int64  `json:"category"`
+}
+type postResponse struct {
+	Id        int64       `json:"id"`
+	Author    string      `json:"author"`
+	Title     string      `json:"title"`
+	Body      string      `json:"body"`
+	Category  db.Category `json:"category"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+}
+
+func newPostResponse(post db.Post, category db.Category) postResponse {
+	return postResponse{
+		Id:        post.ID,
+		Author:    post.Author,
+		Title:     post.Title,
+		Body:      post.Body,
+		Category:  category,
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+	}
 }
 
 func (server *Server) createPost(ctx *gin.Context) {
@@ -53,8 +77,35 @@ func (server *Server) createPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	category, err := server.store.GetCategory(ctx, req.Category)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 
-	ctx.JSON(http.StatusOK, post)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg2 := db.CreatePostCategoryParams{
+		PostID:     post.ID,
+		CategoryID: category.ID,
+	}
+	server.store.CreatePostCategory(ctx, arg2)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	rsp := newPostResponse(post, category)
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type getPostRequest struct {
@@ -78,7 +129,18 @@ func (server *Server) getPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, post)
+	postCategory, err := server.store.GetPostCategory(ctx, post.ID)
+	category, err := server.store.GetCategory(ctx, postCategory.CategoryID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Printf("post_id = %v's category not set", post.ID)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+	}
+	rsp := newPostResponse(post, category)
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type listPostRequest struct {
@@ -100,11 +162,28 @@ func (server *Server) listPosts(ctx *gin.Context) {
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
-	accounts, err := server.store.ListPosts(ctx, arg)
+	posts, err := server.store.ListPosts(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	var response []postResponse
+	for i := range posts {
+		post := posts[i]
+		postCategory, err := server.store.GetPostCategory(ctx, post.ID)
+		category, err := server.store.GetCategory(ctx, postCategory.CategoryID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v's category not set", post.ID)
+			} else {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
 
-	ctx.JSON(http.StatusOK, accounts)
+		}
+		rsp := newPostResponse(post, category)
+		response = append(response, rsp)
+	}
+
+	ctx.JSON(http.StatusOK, response)
 }

@@ -19,3 +19,17 @@ func (q *Queries) CreateCategory(ctx context.Context, name string) (Category, er
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
+
+const getCategory = `-- name: GetCategory :one
+SELECT id, name
+FROM category
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetCategory(ctx context.Context, id int64) (Category, error) {
+	row := q.db.QueryRowContext(ctx, getCategory, id)
+	var i Category
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
