@@ -26,15 +26,17 @@ func (q *Queries) CreatePostCategory(ctx context.Context, arg CreatePostCategory
 }
 
 const getPostCategory = `-- name: GetPostCategory :one
-SELECT id, post_id, category_id
-FROM post_category
-WHERE post_id = $1
+SELECT category.id,
+  name
+FROM category
+  JOIN post_category ON category.id = category_id
+  AND post_id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetPostCategory(ctx context.Context, postID int64) (PostCategory, error) {
+func (q *Queries) GetPostCategory(ctx context.Context, postID int64) (Category, error) {
 	row := q.db.QueryRowContext(ctx, getPostCategory, postID)
-	var i PostCategory
-	err := row.Scan(&i.ID, &i.PostID, &i.CategoryID)
+	var i Category
+	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }

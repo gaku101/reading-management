@@ -245,10 +245,10 @@ func (mr *MockStoreMockRecorder) GetPost(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // GetPostCategory mocks base method.
-func (m *MockStore) GetPostCategory(arg0 context.Context, arg1 int64) (db.PostCategory, error) {
+func (m *MockStore) GetPostCategory(arg0 context.Context, arg1 int64) (db.Category, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPostCategory", arg0, arg1)
-	ret0, _ := ret[0].(db.PostCategory)
+	ret0, _ := ret[0].(db.Category)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
