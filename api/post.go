@@ -129,8 +129,7 @@ func (server *Server) getPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	postCategory, err := server.store.GetPostCategory(ctx, post.ID)
-	category, err := server.store.GetCategory(ctx, postCategory.CategoryID)
+	category, err := server.store.GetPostCategory(ctx, post.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Printf("post_id = %v's category not set", post.ID)
@@ -170,8 +169,7 @@ func (server *Server) listPosts(ctx *gin.Context) {
 	var response []postResponse
 	for i := range posts {
 		post := posts[i]
-		postCategory, err := server.store.GetPostCategory(ctx, post.ID)
-		category, err := server.store.GetCategory(ctx, postCategory.CategoryID)
+		category, err := server.store.GetPostCategory(ctx, post.ID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Printf("post_id = %v's category not set", post.ID)
