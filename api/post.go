@@ -80,29 +80,31 @@ func (server *Server) createPost(ctx *gin.Context) {
 	category, err := server.store.GetCategory(ctx, req.Category)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			fmt.Printf("post_id = %v's category not set", post.ID)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
 	}
 	arg2 := db.CreatePostCategoryParams{
 		PostID:     post.ID,
 		CategoryID: category.ID,
 	}
-	server.store.CreatePostCategory(ctx, arg2)
-	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "foreign_key_violation", "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
-				return
+	if category.ID != 0 {
+		server.store.CreatePostCategory(ctx, arg2)
+		if err != nil {
+			if pqErr, ok := err.(*pq.Error); ok {
+				switch pqErr.Code.Name() {
+				case "foreign_key_violation", "unique_violation":
+					ctx.JSON(http.StatusForbidden, errorResponse(err))
+					return
+				}
 			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
 	}
+
 	rsp := newPostResponse(post, category)
 
 	ctx.JSON(http.StatusOK, rsp)
