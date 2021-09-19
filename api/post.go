@@ -144,7 +144,7 @@ func (server *Server) getPost(ctx *gin.Context) {
 
 type listPostRequest struct {
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
 }
 
 func (server *Server) listPosts(ctx *gin.Context) {
