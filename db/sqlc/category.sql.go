@@ -33,3 +33,32 @@ func (q *Queries) GetCategory(ctx context.Context, id int64) (Category, error) {
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
+
+const listCategories = `-- name: ListCategories :many
+SELECT id, name
+FROM category
+ORDER BY id
+`
+
+func (q *Queries) ListCategories(ctx context.Context) ([]Category, error) {
+	rows, err := q.db.QueryContext(ctx, listCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -24,6 +24,7 @@ type Querier interface {
 	GetPostCategory(ctx context.Context, postID int64) (Category, error)
 	GetTransfer(ctx context.Context, id int64) (Transfer, error)
 	GetUser(ctx context.Context, username string) (User, error)
+	ListCategories(ctx context.Context) ([]Category, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
