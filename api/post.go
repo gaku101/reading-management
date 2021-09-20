@@ -17,7 +17,7 @@ type createPostRequest struct {
 	Author   string `json:"author" binding:"required,alphanum"`
 	Title    string `json:"title" binding:"required"`
 	Body     string `json:"body" binding:"required"`
-	Category int64  `json:"category"`
+	CategoryID int64  `json:"categoryId"`
 }
 type postResponse struct {
 	Id        int64       `json:"id"`
@@ -77,7 +77,7 @@ func (server *Server) createPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	category, err := server.store.GetCategory(ctx, req.Category)
+	category, err := server.store.GetCategory(ctx, req.CategoryID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Printf("post_id = %v's category not set", post.ID)
@@ -186,4 +186,65 @@ func (server *Server) listPosts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+type updatePostRequest struct {
+	ID         int64  `json:"id" binding:"required,min=1"`
+	Author     string `json:"author" binding:"required,alphanum"`
+	Title      string `json:"title"`
+	Body       string `json:"body"`
+	CategoryID int64  `json:"categoryId"`
+}
+
+func (server *Server) updatePost(ctx *gin.Context) {
+	var req updatePostRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, valid := server.validUser(ctx, req.Author)
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("Not allowed to update other user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdatePostParams{
+		ID:    req.ID,
+		Title: req.Title,
+		Body:  req.Body,
+	}
+
+	post, err := server.store.UpdatePost(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	category, err := server.store.GetCategory(ctx, req.CategoryID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Printf("post_id = %v's category not set", post.ID)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+	}
+	arg2 := db.UpdatePostCategoryParams{
+		PostID:     post.ID,
+		CategoryID: category.ID,
+	}
+	server.store.UpdatePostCategory(ctx, arg2)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	rsp := newPostResponse(post, category)
+
+	ctx.JSON(http.StatusOK, rsp)
 }

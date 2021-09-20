@@ -40,3 +40,22 @@ func (q *Queries) GetPostCategory(ctx context.Context, postID int64) (Category, 
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
+
+const updatePostCategory = `-- name: UpdatePostCategory :one
+UPDATE post_category
+SET category_id = $2
+WHERE post_id = $1
+RETURNING id, post_id, category_id
+`
+
+type UpdatePostCategoryParams struct {
+	PostID     int64 `json:"post_id"`
+	CategoryID int64 `json:"category_id"`
+}
+
+func (q *Queries) UpdatePostCategory(ctx context.Context, arg UpdatePostCategoryParams) (PostCategory, error) {
+	row := q.db.QueryRowContext(ctx, updatePostCategory, arg.PostID, arg.CategoryID)
+	var i PostCategory
+	err := row.Scan(&i.ID, &i.PostID, &i.CategoryID)
+	return i, err
+}

@@ -9,3 +9,8 @@ FROM category
   JOIN post_category ON category.id = category_id
   AND post_id = $1
 LIMIT 1;
+-- name: UpdatePostCategory :one
+UPDATE post_category
+SET category_id = $2
+WHERE post_id = $1
+RETURNING *;
