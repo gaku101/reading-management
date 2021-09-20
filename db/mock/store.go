@@ -379,6 +379,36 @@ func (mr *MockStoreMockRecorder) UpdateAccount(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccount", reflect.TypeOf((*MockStore)(nil).UpdateAccount), arg0, arg1)
 }
 
+// UpdatePost mocks base method.
+func (m *MockStore) UpdatePost(arg0 context.Context, arg1 db.UpdatePostParams) (db.Post, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePost", arg0, arg1)
+	ret0, _ := ret[0].(db.Post)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdatePost indicates an expected call of UpdatePost.
+func (mr *MockStoreMockRecorder) UpdatePost(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePost", reflect.TypeOf((*MockStore)(nil).UpdatePost), arg0, arg1)
+}
+
+// UpdatePostCategory mocks base method.
+func (m *MockStore) UpdatePostCategory(arg0 context.Context, arg1 db.UpdatePostCategoryParams) (db.PostCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePostCategory", arg0, arg1)
+	ret0, _ := ret[0].(db.PostCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdatePostCategory indicates an expected call of UpdatePostCategory.
+func (mr *MockStoreMockRecorder) UpdatePostCategory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePostCategory", reflect.TypeOf((*MockStore)(nil).UpdatePostCategory), arg0, arg1)
+}
+
 // UpdateUser mocks base method.
 func (m *MockStore) UpdateUser(arg0 context.Context, arg1 db.UpdateUserParams) (db.User, error) {
 	m.ctrl.T.Helper()

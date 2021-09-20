@@ -13,3 +13,9 @@ FROM posts
 WHERE author = $1
 ORDER BY id
 LIMIT $2 OFFSET $3;
+-- name: UpdatePost :one
+UPDATE posts
+SET title = $2,
+  body = $3
+WHERE id = $1
+RETURNING *;
