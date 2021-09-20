@@ -14,9 +14,9 @@ import (
 )
 
 type createPostRequest struct {
-	Author   string `json:"author" binding:"required,alphanum"`
-	Title    string `json:"title" binding:"required"`
-	Body     string `json:"body" binding:"required"`
+	Author     string `json:"author" binding:"required,alphanum"`
+	Title      string `json:"title" binding:"required"`
+	Body       string `json:"body" binding:"required"`
 	CategoryID int64  `json:"categoryId"`
 }
 type postResponse struct {
@@ -239,12 +239,33 @@ func (server *Server) updatePost(ctx *gin.Context) {
 		PostID:     post.ID,
 		CategoryID: category.ID,
 	}
-	server.store.UpdatePostCategory(ctx, arg2)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
+	arg3 := db.CreatePostCategoryParams{
+		PostID:     post.ID,
+		CategoryID: category.ID,
+	}
+	if req.CategoryID != 0 {
+		_, err = server.store.UpdatePostCategory(ctx, arg2)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				_, err = server.store.CreatePostCategory(ctx, arg3)
+				if err != nil {
+					if pqErr, ok := err.(*pq.Error); ok {
+						switch pqErr.Code.Name() {
+						case "foreign_key_violation", "unique_violation":
+							ctx.JSON(http.StatusForbidden, errorResponse(err))
+							return
+						}
+					} else {
+						ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+						return
+					}
+				}
+			} else {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+		}
 	}
 	rsp := newPostResponse(post, category)
-
 	ctx.JSON(http.StatusOK, rsp)
 }
