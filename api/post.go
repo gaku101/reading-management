@@ -188,6 +188,45 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+func (server *Server) listPosts(ctx *gin.Context) {
+	var req listPostRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	arg := db.ListPostsParams{
+		Author: authPayload.Username,
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	}
+
+	posts, err := server.store.ListPosts(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	var response []postResponse
+	for i := range posts {
+		post := posts[i]
+		category, err := server.store.GetPostCategory(ctx, post.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v's category not set", post.ID)
+			} else {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+		}
+		rsp := newPostResponse(post, category)
+		response = append(response, rsp)
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 type updatePostRequest struct {
 	ID         int64  `json:"id" binding:"required,min=1"`
 	Author     string `json:"author" binding:"required,alphanum"`

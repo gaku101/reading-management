@@ -13,6 +13,12 @@ FROM posts
 WHERE author = $1
 ORDER BY id
 LIMIT $2 OFFSET $3;
+-- name: ListPosts :many
+SELECT *
+FROM posts
+WHERE NOT author = $1
+ORDER BY id DESC
+LIMIT $2 OFFSET $3;
 -- name: UpdatePost :one
 UPDATE posts
 SET title = $2,
