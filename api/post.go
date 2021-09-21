@@ -149,7 +149,7 @@ type listPostRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
 }
 
-func (server *Server) listPosts(ctx *gin.Context) {
+func (server *Server) listMyPosts(ctx *gin.Context) {
 	var req listPostRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -157,13 +157,13 @@ func (server *Server) listPosts(ctx *gin.Context) {
 	}
 
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	arg := db.ListPostsParams{
+	arg := db.ListMyPostsParams{
 		Author: authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
-	posts, err := server.store.ListPosts(ctx, arg)
+	posts, err := server.store.ListMyPosts(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

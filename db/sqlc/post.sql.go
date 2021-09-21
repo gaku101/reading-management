@@ -54,7 +54,7 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 	return i, err
 }
 
-const listPosts = `-- name: ListPosts :many
+const listMyPosts = `-- name: ListMyPosts :many
 SELECT id, author, title, body, created_at, updated_at
 FROM posts
 WHERE author = $1
@@ -62,14 +62,14 @@ ORDER BY id
 LIMIT $2 OFFSET $3
 `
 
-type ListPostsParams struct {
+type ListMyPostsParams struct {
 	Author string `json:"author"`
 	Limit  int32  `json:"limit"`
 	Offset int32  `json:"offset"`
 }
 
-func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error) {
-	rows, err := q.db.QueryContext(ctx, listPosts, arg.Author, arg.Limit, arg.Offset)
+func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, listMyPosts, arg.Author, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

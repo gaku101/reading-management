@@ -7,7 +7,7 @@ SELECT *
 FROM posts
 WHERE id = $1
 LIMIT 1;
--- name: ListPosts :many
+-- name: ListMyPosts :many
 SELECT *
 FROM posts
 WHERE author = $1
