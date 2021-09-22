@@ -155,9 +155,8 @@ func (server *Server) getUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := getUserResponse{
-		User: newUserResponse(user),
-	}
+	rsp := newUserResponse(user)
+
 	ctx.JSON(http.StatusOK, rsp)
 }
 
