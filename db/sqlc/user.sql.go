@@ -66,6 +66,20 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	return i, err
 }
 
+const getUserImage = `-- name: GetUserImage :one
+SELECT image
+FROM users
+WHERE username = $1
+LIMIT 1
+`
+
+func (q *Queries) GetUserImage(ctx context.Context, username string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getUserImage, username)
+	var image string
+	err := row.Scan(&image)
+	return image, err
+}
+
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET username = $2,

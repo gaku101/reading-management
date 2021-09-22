@@ -20,24 +20,26 @@ type createPostRequest struct {
 	CategoryID int64  `json:"categoryId"`
 }
 type postResponse struct {
-	Id        int64       `json:"id"`
-	Author    string      `json:"author"`
-	Title     string      `json:"title"`
-	Body      string      `json:"body"`
-	Category  db.Category `json:"category"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	Id          int64       `json:"id"`
+	Author      string      `json:"author"`
+	Title       string      `json:"title"`
+	Body        string      `json:"body"`
+	Category    db.Category `json:"category"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	AuthorImage string      `json:"authorImage"`
 }
 
-func newPostResponse(post db.Post, category db.Category) postResponse {
+func newPostResponse(post db.Post, category db.Category, authorImage string) postResponse {
 	return postResponse{
-		Id:        post.ID,
-		Author:    post.Author,
-		Title:     post.Title,
-		Body:      post.Body,
-		Category:  category,
-		CreatedAt: post.CreatedAt,
-		UpdatedAt: post.UpdatedAt,
+		Id:          post.ID,
+		Author:      post.Author,
+		Title:       post.Title,
+		Body:        post.Body,
+		Category:    category,
+		CreatedAt:   post.CreatedAt,
+		UpdatedAt:   post.UpdatedAt,
+		AuthorImage: authorImage,
 	}
 }
 
@@ -105,7 +107,7 @@ func (server *Server) createPost(ctx *gin.Context) {
 		}
 	}
 
-	rsp := newPostResponse(post, category)
+	rsp := newPostResponse(post, category, "")
 
 	ctx.JSON(http.StatusOK, rsp)
 }
@@ -140,7 +142,7 @@ func (server *Server) getPost(ctx *gin.Context) {
 			return
 		}
 	}
-	rsp := newPostResponse(post, category)
+	rsp := newPostResponse(post, category, "")
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -181,7 +183,7 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 			}
 
 		}
-		rsp := newPostResponse(post, category)
+		rsp := newPostResponse(post, category, "")
 		response = append(response, rsp)
 	}
 
@@ -220,7 +222,17 @@ func (server *Server) listPosts(ctx *gin.Context) {
 			}
 
 		}
-		rsp := newPostResponse(post, category)
+		authorImage, err := server.store.GetUserImage(ctx, post.Author)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		rsp := newPostResponse(post, category, authorImage)
 		response = append(response, rsp)
 	}
 
@@ -305,6 +317,6 @@ func (server *Server) updatePost(ctx *gin.Context) {
 			}
 		}
 	}
-	rsp := newPostResponse(post, category)
+	rsp := newPostResponse(post, category, "")
 	ctx.JSON(http.StatusOK, rsp)
 }

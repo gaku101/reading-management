@@ -289,6 +289,21 @@ func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
 }
 
+// GetUserImage mocks base method.
+func (m *MockStore) GetUserImage(arg0 context.Context, arg1 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserImage", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserImage indicates an expected call of GetUserImage.
+func (mr *MockStoreMockRecorder) GetUserImage(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserImage", reflect.TypeOf((*MockStore)(nil).GetUserImage), arg0, arg1)
+}
+
 // ListCategories mocks base method.
 func (m *MockStore) ListCategories(arg0 context.Context) ([]db.Category, error) {
 	m.ctrl.T.Helper()
