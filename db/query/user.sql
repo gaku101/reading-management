@@ -14,3 +14,8 @@ SET username = $2,
   image = $4
 WHERE id = $1
 RETURNING *;
+-- name: GetUserImage :one
+SELECT image
+FROM users
+WHERE username = $1
+LIMIT 1;
