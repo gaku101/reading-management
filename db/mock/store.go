@@ -125,6 +125,21 @@ func (mr *MockStoreMockRecorder) CreatePostCategory(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePostCategory", reflect.TypeOf((*MockStore)(nil).CreatePostCategory), arg0, arg1)
 }
 
+// CreatePostFavorite mocks base method.
+func (m *MockStore) CreatePostFavorite(arg0 context.Context, arg1 db.CreatePostFavoriteParams) (db.PostFavorite, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePostFavorite", arg0, arg1)
+	ret0, _ := ret[0].(db.PostFavorite)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePostFavorite indicates an expected call of CreatePostFavorite.
+func (mr *MockStoreMockRecorder) CreatePostFavorite(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePostFavorite", reflect.TypeOf((*MockStore)(nil).CreatePostFavorite), arg0, arg1)
+}
+
 // CreateTransfer mocks base method.
 func (m *MockStore) CreateTransfer(arg0 context.Context, arg1 db.CreateTransferParams) (db.Transfer, error) {
 	m.ctrl.T.Helper()
@@ -302,6 +317,21 @@ func (m *MockStore) GetUser(arg0 context.Context, arg1 string) (db.User, error) 
 func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
+}
+
+// GetUserById mocks base method.
+func (m *MockStore) GetUserById(arg0 context.Context, arg1 int64) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserById", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserById indicates an expected call of GetUserById.
+func (mr *MockStoreMockRecorder) GetUserById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockStore)(nil).GetUserById), arg0, arg1)
 }
 
 // GetUserImage mocks base method.
