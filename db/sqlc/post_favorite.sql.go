@@ -24,3 +24,53 @@ func (q *Queries) CreatePostFavorite(ctx context.Context, arg CreatePostFavorite
 	err := row.Scan(&i.ID, &i.PostID, &i.UserID)
 	return i, err
 }
+
+const listFavoritePosts = `-- name: ListFavoritePosts :many
+SELECT posts.id,
+  author,
+  title,
+  body,
+  created_at,
+  updated_at
+FROM posts
+  JOIN post_favorites ON posts.id = post_id
+  AND user_id = $1
+ORDER BY id DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListFavoritePostsParams struct {
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, listFavoritePosts, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Author,
+			&i.Title,
+			&i.Body,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

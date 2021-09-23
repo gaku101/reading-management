@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
@@ -27,19 +28,8 @@ func (server *Server) createPostFavorite(ctx *gin.Context) {
 		PostID: req.PostID,
 		UserID: req.UserID,
 	}
-	user, err := server.store.GetUserById(ctx, arg.UserID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	if user.Username != authPayload.Username {
-		err := errors.New("Not allowed to make other user's favorite")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	isAuthorized := server.authorizedUser(ctx, arg.UserID)
+	if !isAuthorized {
 		return
 	}
 	postFavorite, err := server.store.CreatePostFavorite(ctx, arg)
@@ -56,4 +46,87 @@ func (server *Server) createPostFavorite(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, postFavorite)
+}
+
+type listFavoritePostsParams struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
+}
+type listFavoritePostsRequest struct {
+	UserID int64 `json:"userId" binding:"required,min=1"`
+}
+
+func (server *Server) listFavoritePosts(ctx *gin.Context) {
+	var param listFavoritePostsParams
+	if err := ctx.ShouldBindQuery(&param); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	var req listFavoritePostsRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	arg := db.ListFavoritePostsParams{
+		UserID: req.UserID,
+		Limit:  param.PageSize,
+		Offset: (param.PageID - 1) * param.PageSize,
+	}
+	isAuthorized := server.authorizedUser(ctx, arg.UserID)
+	if !isAuthorized {
+		return
+	}
+	favoritePosts, err := server.store.ListFavoritePosts(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	var response []postResponse
+	for i := range favoritePosts {
+		post := favoritePosts[i]
+		category, err := server.store.GetPostCategory(ctx, post.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v's category not set", post.ID)
+			} else {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+		}
+		authorImage, err := server.store.GetUserImage(ctx, post.Author)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		rsp := newPostResponse(post, category, authorImage)
+		response = append(response, rsp)
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (server *Server) authorizedUser(ctx *gin.Context, userId int64) bool {
+	user, err := server.store.GetUserById(ctx, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return false
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return false
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("Not allowed to make other user's favorite")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return false
+	}
+
+	return true
 }
