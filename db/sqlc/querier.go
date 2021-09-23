@@ -13,6 +13,7 @@ type Querier interface {
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreatePostCategory(ctx context.Context, arg CreatePostCategoryParams) (PostCategory, error)
+	CreatePostFavorite(ctx context.Context, arg CreatePostFavoriteParams) (PostFavorite, error)
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, id int64) error
@@ -25,6 +26,7 @@ type Querier interface {
 	GetPostCategory(ctx context.Context, postID int64) (Category, error)
 	GetTransfer(ctx context.Context, id int64) (Transfer, error)
 	GetUser(ctx context.Context, username string) (User, error)
+	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserImage(ctx context.Context, username string) (string, error)
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
