@@ -53,7 +53,7 @@ type listFavoritePostsParams struct {
 	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
 }
 type listFavoritePostsRequest struct {
-	UserID int64 `json:"userId" binding:"required,min=1"`
+	UserID int64 `uri:"userId" binding:"required,min=1"`
 }
 
 func (server *Server) listFavoritePosts(ctx *gin.Context) {
@@ -63,7 +63,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 		return
 	}
 	var req listFavoritePostsRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
