@@ -14,3 +14,8 @@ FROM posts
   AND user_id = $1
 ORDER BY id DESC
 LIMIT $2 OFFSET $3;
+-- name: GetPostFavorite :one
+SELECT *
+FROM post_favorites
+WHERE post_id = $1
+LIMIT 1;
