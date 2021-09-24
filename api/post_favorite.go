@@ -111,6 +111,30 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+type getPostFavoriteRequest struct {
+	PostID int64 `uri:"postId" binding:"required,min=1"`
+}
+
+func (server *Server) getPostFavorite(ctx *gin.Context) {
+	var req getPostFavoriteRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	postFavorite, err := server.store.GetPostFavorite(ctx, req.PostID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, postFavorite)
+}
+
 func (server *Server) authorizedUser(ctx *gin.Context, userId int64) bool {
 	user, err := server.store.GetUserById(ctx, userId)
 	if err != nil {

@@ -289,6 +289,21 @@ func (mr *MockStoreMockRecorder) GetPostCategory(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostCategory", reflect.TypeOf((*MockStore)(nil).GetPostCategory), arg0, arg1)
 }
 
+// GetPostFavorite mocks base method.
+func (m *MockStore) GetPostFavorite(arg0 context.Context, arg1 int64) (db.PostFavorite, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPostFavorite", arg0, arg1)
+	ret0, _ := ret[0].(db.PostFavorite)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPostFavorite indicates an expected call of GetPostFavorite.
+func (mr *MockStoreMockRecorder) GetPostFavorite(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostFavorite", reflect.TypeOf((*MockStore)(nil).GetPostFavorite), arg0, arg1)
+}
+
 // GetTransfer mocks base method.
 func (m *MockStore) GetTransfer(arg0 context.Context, arg1 int64) (db.Transfer, error) {
 	m.ctrl.T.Helper()

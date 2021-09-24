@@ -25,6 +25,20 @@ func (q *Queries) CreatePostFavorite(ctx context.Context, arg CreatePostFavorite
 	return i, err
 }
 
+const getPostFavorite = `-- name: GetPostFavorite :one
+SELECT id, post_id, user_id
+FROM post_favorites
+WHERE post_id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetPostFavorite(ctx context.Context, postID int64) (PostFavorite, error) {
+	row := q.db.QueryRowContext(ctx, getPostFavorite, postID)
+	var i PostFavorite
+	err := row.Scan(&i.ID, &i.PostID, &i.UserID)
+	return i, err
+}
+
 const listFavoritePosts = `-- name: ListFavoritePosts :many
 SELECT posts.id,
   author,
