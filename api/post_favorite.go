@@ -121,8 +121,21 @@ func (server *Server) getPostFavorite(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	postFavorite, err := server.store.GetPostFavorite(ctx, req.PostID)
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg := db.GetPostFavoriteParams{
+		PostID: req.PostID,
+		UserID: user.ID,
+	}
+	postFavorite, err := server.store.GetPostFavorite(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusOK, nil)

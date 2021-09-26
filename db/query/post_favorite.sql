@@ -18,4 +18,5 @@ LIMIT $2 OFFSET $3;
 SELECT *
 FROM post_favorites
 WHERE post_id = $1
+  AND user_id = $2
 LIMIT 1;

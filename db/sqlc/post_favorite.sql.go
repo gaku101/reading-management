@@ -29,11 +29,17 @@ const getPostFavorite = `-- name: GetPostFavorite :one
 SELECT id, post_id, user_id
 FROM post_favorites
 WHERE post_id = $1
+  AND user_id = $2
 LIMIT 1
 `
 
-func (q *Queries) GetPostFavorite(ctx context.Context, postID int64) (PostFavorite, error) {
-	row := q.db.QueryRowContext(ctx, getPostFavorite, postID)
+type GetPostFavoriteParams struct {
+	PostID int64 `json:"post_id"`
+	UserID int64 `json:"user_id"`
+}
+
+func (q *Queries) GetPostFavorite(ctx context.Context, arg GetPostFavoriteParams) (PostFavorite, error) {
+	row := q.db.QueryRowContext(ctx, getPostFavorite, arg.PostID, arg.UserID)
 	var i PostFavorite
 	err := row.Scan(&i.ID, &i.PostID, &i.UserID)
 	return i, err

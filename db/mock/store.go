@@ -290,7 +290,7 @@ func (mr *MockStoreMockRecorder) GetPostCategory(arg0, arg1 interface{}) *gomock
 }
 
 // GetPostFavorite mocks base method.
-func (m *MockStore) GetPostFavorite(arg0 context.Context, arg1 int64) (db.PostFavorite, error) {
+func (m *MockStore) GetPostFavorite(arg0 context.Context, arg1 db.GetPostFavoriteParams) (db.PostFavorite, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPostFavorite", arg0, arg1)
 	ret0, _ := ret[0].(db.PostFavorite)
