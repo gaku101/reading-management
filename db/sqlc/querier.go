@@ -11,6 +11,7 @@ type Querier interface {
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateCategory(ctx context.Context, name string) (Category, error)
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
+	CreateFollow(ctx context.Context, arg CreateFollowParams) (Follow, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreatePostCategory(ctx context.Context, arg CreatePostCategoryParams) (PostCategory, error)
 	CreatePostFavorite(ctx context.Context, arg CreatePostFavoriteParams) (PostFavorite, error)
