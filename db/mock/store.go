@@ -95,6 +95,21 @@ func (mr *MockStoreMockRecorder) CreateEntry(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEntry", reflect.TypeOf((*MockStore)(nil).CreateEntry), arg0, arg1)
 }
 
+// CreateFollow mocks base method.
+func (m *MockStore) CreateFollow(arg0 context.Context, arg1 db.CreateFollowParams) (db.Follow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFollow", arg0, arg1)
+	ret0, _ := ret[0].(db.Follow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateFollow indicates an expected call of CreateFollow.
+func (mr *MockStoreMockRecorder) CreateFollow(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFollow", reflect.TypeOf((*MockStore)(nil).CreateFollow), arg0, arg1)
+}
+
 // CreatePost mocks base method.
 func (m *MockStore) CreatePost(arg0 context.Context, arg1 db.CreatePostParams) (db.Post, error) {
 	m.ctrl.T.Helper()
