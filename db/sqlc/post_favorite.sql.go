@@ -25,7 +25,7 @@ func (q *Queries) CreatePostFavorite(ctx context.Context, arg CreatePostFavorite
 	return i, err
 }
 
-const getPostFavorite = `-- name: GetPostFavorite :one
+const getMyFavoritePost = `-- name: GetMyFavoritePost :one
 SELECT id, post_id, user_id
 FROM post_favorites
 WHERE post_id = $1
@@ -33,16 +33,45 @@ WHERE post_id = $1
 LIMIT 1
 `
 
-type GetPostFavoriteParams struct {
+type GetMyFavoritePostParams struct {
 	PostID int64 `json:"post_id"`
 	UserID int64 `json:"user_id"`
 }
 
-func (q *Queries) GetPostFavorite(ctx context.Context, arg GetPostFavoriteParams) (PostFavorite, error) {
-	row := q.db.QueryRowContext(ctx, getPostFavorite, arg.PostID, arg.UserID)
+func (q *Queries) GetMyFavoritePost(ctx context.Context, arg GetMyFavoritePostParams) (PostFavorite, error) {
+	row := q.db.QueryRowContext(ctx, getMyFavoritePost, arg.PostID, arg.UserID)
 	var i PostFavorite
 	err := row.Scan(&i.ID, &i.PostID, &i.UserID)
 	return i, err
+}
+
+const getPostFavorite = `-- name: GetPostFavorite :many
+SELECT id
+FROM post_favorites
+WHERE post_id = $1
+`
+
+func (q *Queries) GetPostFavorite(ctx context.Context, postID int64) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, getPostFavorite, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []int64{}
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listFavoritePosts = `-- name: ListFavoritePosts :many
