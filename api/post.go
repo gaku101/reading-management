@@ -28,9 +28,10 @@ type postResponse struct {
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
 	AuthorImage string      `json:"authorImage"`
+	Favorites   int         `json:"favorites"`
 }
 
-func newPostResponse(post db.Post, category db.Category, authorImage string) postResponse {
+func newPostResponse(post db.Post, category db.Category, authorImage string, favorites int) postResponse {
 	return postResponse{
 		Id:          post.ID,
 		Author:      post.Author,
@@ -40,6 +41,7 @@ func newPostResponse(post db.Post, category db.Category, authorImage string) pos
 		CreatedAt:   post.CreatedAt,
 		UpdatedAt:   post.UpdatedAt,
 		AuthorImage: authorImage,
+		Favorites:   favorites,
 	}
 }
 
@@ -107,7 +109,7 @@ func (server *Server) createPost(ctx *gin.Context) {
 		}
 	}
 
-	rsp := newPostResponse(post, category, "")
+	rsp := newPostResponse(post, category, "", 0)
 
 	ctx.JSON(http.StatusOK, rsp)
 }
@@ -142,7 +144,8 @@ func (server *Server) getPost(ctx *gin.Context) {
 			return
 		}
 	}
-	rsp := newPostResponse(post, category, "")
+	postFavorite := len(server.getFavoriteCount(ctx, post.ID))
+	rsp := newPostResponse(post, category, "", postFavorite)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -183,7 +186,8 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 			}
 
 		}
-		rsp := newPostResponse(post, category, "")
+		postFavorite := len(server.getFavoriteCount(ctx, post.ID))
+		rsp := newPostResponse(post, category, "", postFavorite)
 		response = append(response, rsp)
 	}
 
@@ -232,7 +236,8 @@ func (server *Server) listPosts(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		rsp := newPostResponse(post, category, authorImage)
+		favorites := len(server.getFavoriteCount(ctx, post.ID))
+		rsp := newPostResponse(post, category, authorImage, favorites)
 		response = append(response, rsp)
 	}
 
@@ -317,6 +322,20 @@ func (server *Server) updatePost(ctx *gin.Context) {
 			}
 		}
 	}
-	rsp := newPostResponse(post, category, "")
+	favorites := len(server.getFavoriteCount(ctx, post.ID))
+	rsp := newPostResponse(post, category, "", favorites)
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) getFavoriteCount(ctx *gin.Context, postId int64) []int64 {
+	postFavorite, err := server.store.GetPostFavorite(ctx, postId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return postFavorite
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return postFavorite
+	}
+	return postFavorite
 }

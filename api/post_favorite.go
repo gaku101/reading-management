@@ -104,7 +104,8 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		rsp := newPostResponse(post, category, authorImage)
+		favorites := len(server.getFavoriteCount(ctx, post.ID))
+		rsp := newPostResponse(post, category, authorImage, favorites)
 		response = append(response, rsp)
 	}
 
@@ -131,11 +132,11 @@ func (server *Server) getPostFavorite(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	arg := db.GetPostFavoriteParams{
+	arg := db.GetMyFavoritePostParams{
 		PostID: req.PostID,
 		UserID: user.ID,
 	}
-	postFavorite, err := server.store.GetPostFavorite(ctx, arg)
+	postFavorite, err := server.store.GetMyFavoritePost(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusOK, nil)
