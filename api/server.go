@@ -70,6 +70,7 @@ func (server *Server) setupRouter() {
 
 	authRoutes.POST("/follow", server.createFollow)
 	authRoutes.GET("/follow/:followingId", server.getFollow)
+	authRoutes.GET("/follow", server.listFollow)
 
 	server.router = router
 }
