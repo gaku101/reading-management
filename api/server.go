@@ -69,7 +69,7 @@ func (server *Server) setupRouter() {
 	authRoutes.POST("/post-favorite", server.createPostFavorite)
 
 	authRoutes.POST("/follow", server.createFollow)
-
+	authRoutes.GET("/follow/:followingId", server.getFollow)
 
 	server.router = router
 }

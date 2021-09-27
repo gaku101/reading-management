@@ -23,6 +23,7 @@ type Querier interface {
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
 	GetEntry(ctx context.Context, id int64) (Entry, error)
+	GetFollow(ctx context.Context, arg GetFollowParams) (Follow, error)
 	GetMyFavoritePost(ctx context.Context, arg GetMyFavoritePostParams) (PostFavorite, error)
 	GetPost(ctx context.Context, id int64) (Post, error)
 	GetPostCategory(ctx context.Context, postID int64) (Category, error)
