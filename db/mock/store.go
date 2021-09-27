@@ -274,6 +274,21 @@ func (mr *MockStoreMockRecorder) GetEntry(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntry", reflect.TypeOf((*MockStore)(nil).GetEntry), arg0, arg1)
 }
 
+// GetFollow mocks base method.
+func (m *MockStore) GetFollow(arg0 context.Context, arg1 db.GetFollowParams) (db.Follow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFollow", arg0, arg1)
+	ret0, _ := ret[0].(db.Follow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFollow indicates an expected call of GetFollow.
+func (mr *MockStoreMockRecorder) GetFollow(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFollow", reflect.TypeOf((*MockStore)(nil).GetFollow), arg0, arg1)
+}
+
 // GetMyFavoritePost mocks base method.
 func (m *MockStore) GetMyFavoritePost(arg0 context.Context, arg1 db.GetMyFavoritePostParams) (db.PostFavorite, error) {
 	m.ctrl.T.Helper()

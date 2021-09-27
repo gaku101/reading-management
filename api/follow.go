@@ -21,7 +21,6 @@ func (server *Server) createFollow(ctx *gin.Context) {
 		return
 	}
 
-	
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	user, err := server.store.GetUser(ctx, authPayload.Username)
 	if err != nil {
@@ -49,5 +48,42 @@ func (server *Server) createFollow(ctx *gin.Context) {
 		return
 	}
 
+	ctx.JSON(http.StatusOK, follow)
+}
+
+type getFollowRequest struct {
+	FollowongID int64 `uri:"followingId" binding:"required,min=1"`
+}
+
+func (server *Server) getFollow(ctx *gin.Context) {
+	var req getFollowRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg := db.GetFollowParams{
+		FollowingID: req.FollowongID,
+		FollowerID:  user.ID,
+	}
+	follow, err := server.store.GetFollow(ctx, arg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 	ctx.JSON(http.StatusOK, follow)
 }

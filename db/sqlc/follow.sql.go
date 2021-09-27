@@ -24,3 +24,23 @@ func (q *Queries) CreateFollow(ctx context.Context, arg CreateFollowParams) (Fol
 	err := row.Scan(&i.ID, &i.FollowingID, &i.FollowerID)
 	return i, err
 }
+
+const getFollow = `-- name: GetFollow :one
+SELECT id, following_id, follower_id
+FROM follow
+WHERE following_id = $1
+  AND follower_id = $2
+LIMIT 1
+`
+
+type GetFollowParams struct {
+	FollowingID int64 `json:"following_id"`
+	FollowerID  int64 `json:"follower_id"`
+}
+
+func (q *Queries) GetFollow(ctx context.Context, arg GetFollowParams) (Follow, error) {
+	row := q.db.QueryRowContext(ctx, getFollow, arg.FollowingID, arg.FollowerID)
+	var i Follow
+	err := row.Scan(&i.ID, &i.FollowingID, &i.FollowerID)
+	return i, err
+}
