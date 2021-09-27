@@ -44,3 +44,56 @@ func (q *Queries) GetFollow(ctx context.Context, arg GetFollowParams) (Follow, e
 	err := row.Scan(&i.ID, &i.FollowingID, &i.FollowerID)
 	return i, err
 }
+
+const listFollow = `-- name: ListFollow :many
+SELECT users.id,
+  username,
+  profile,
+  image
+FROM follow
+  JOIN users ON following_id = users.id
+  AND follower_id = $1
+ORDER BY id DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListFollowParams struct {
+	FollowerID int64 `json:"follower_id"`
+	Limit      int32 `json:"limit"`
+	Offset     int32 `json:"offset"`
+}
+
+type ListFollowRow struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Profile  string `json:"profile"`
+	Image    string `json:"image"`
+}
+
+func (q *Queries) ListFollow(ctx context.Context, arg ListFollowParams) ([]ListFollowRow, error) {
+	rows, err := q.db.QueryContext(ctx, listFollow, arg.FollowerID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListFollowRow{}
+	for rows.Next() {
+		var i ListFollowRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Profile,
+			&i.Image,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

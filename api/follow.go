@@ -87,3 +87,41 @@ func (server *Server) getFollow(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, follow)
 }
+
+type listFollowParams struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
+}
+
+func (server *Server) listFollow(ctx *gin.Context) {
+	var param listFavoritePostsParams
+	if err := ctx.ShouldBindQuery(&param); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg := db.ListFollowParams{
+		FollowerID: user.ID,
+		Limit:      param.PageSize,
+		Offset:     (param.PageID - 1) * param.PageSize,
+	}
+	follow, err := server.store.ListFollow(ctx, arg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, follow)
+}
