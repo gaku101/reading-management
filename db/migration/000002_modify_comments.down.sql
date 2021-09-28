@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS "comments" DROP COLUMN IF EXISTS "author";
+ALTER TABLE IF EXISTS "comments" DROP CONSTRAINT IF EXISTS "comments_author_fkey";

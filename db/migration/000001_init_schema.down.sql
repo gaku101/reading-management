@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS post_category;
+DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS post_favorites;
 DROP TABLE IF EXISTS follow;
 DROP TABLE IF EXISTS posts;
