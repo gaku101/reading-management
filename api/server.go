@@ -72,6 +72,8 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/follow/:followingId", server.getFollow)
 	authRoutes.GET("/follow", server.listFollow)
 
+	authRoutes.POST("/comments", server.createComment)
+
 	server.router = router
 }
 

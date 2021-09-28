@@ -23,6 +23,7 @@ type Comment struct {
 	PostID    int64     `json:"post_id"`
 	Body      string    `json:"body"`
 	CreatedAt time.Time `json:"created_at"`
+	Author    string    `json:"author"`
 }
 
 type Entry struct {

@@ -10,6 +10,7 @@ type Querier interface {
 	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateCategory(ctx context.Context, name string) (Category, error)
+	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
 	CreateFollow(ctx context.Context, arg CreateFollowParams) (Follow, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)

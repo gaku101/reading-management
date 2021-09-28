@@ -11,15 +11,7 @@ import (
 	"github.com/lib/pq"
 )
 
-type createAccountRequest struct {
-}
-
 func (server *Server) createAccount(ctx *gin.Context) {
-	var req createAccountRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateAccountParams{
 		Owner:   authPayload.Username,
