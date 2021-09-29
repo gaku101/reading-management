@@ -4,12 +4,33 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"time"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
 	"github.com/gaku101/my-portfolio/token"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
+
+type commentResponse struct {
+	Id          int64     `json:"id"`
+	Author      string    `json:"author"`
+	Body        string    `json:"body"`
+	CreatedAt   time.Time `json:"created_at"`
+	AuthorImage string    `json:"authorImage"`
+	PostID      int64     `json:"postId"`
+}
+
+func newCommentResponse(comment db.Comment, authorImage string) commentResponse {
+	return commentResponse{
+		Id:          comment.ID,
+		Author:      comment.Author,
+		Body:        comment.Body,
+		CreatedAt:   comment.CreatedAt,
+		PostID:      comment.PostID,
+		AuthorImage: authorImage,
+	}
+}
 
 type createCommentRequest struct {
 	PostID int64  `json:"postId" binding:"required,min=1"`
@@ -93,5 +114,21 @@ func (server *Server) listComments(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, comments)
+	var response []commentResponse
+	for i := range comments {
+		comment := comments[i]
+		authorImage, err := server.store.GetUserImage(ctx, comment.Author)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		rsp := newCommentResponse(comment, authorImage)
+		response = append(response, rsp)
+	}
+	ctx.JSON(http.StatusOK, response)
 }
