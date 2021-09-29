@@ -34,6 +34,7 @@ type Querier interface {
 	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserImage(ctx context.Context, username string) (string, error)
 	ListCategories(ctx context.Context) ([]Category, error)
+	ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]Post, error)
 	ListFollow(ctx context.Context, arg ListFollowParams) ([]ListFollowRow, error)

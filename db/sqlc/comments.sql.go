@@ -31,3 +31,46 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	)
 	return i, err
 }
+
+const listComments = `-- name: ListComments :many
+SELECT id, post_id, body, created_at, author
+FROM comments
+WHERE post_id = $1
+ORDER BY id DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListCommentsParams struct {
+	PostID int64 `json:"post_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error) {
+	rows, err := q.db.QueryContext(ctx, listComments, arg.PostID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.Body,
+			&i.CreatedAt,
+			&i.Author,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
