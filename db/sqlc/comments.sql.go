@@ -36,7 +36,7 @@ const listComments = `-- name: ListComments :many
 SELECT id, post_id, body, created_at, author
 FROM comments
 WHERE post_id = $1
-ORDER BY id DESC
+ORDER BY id
 LIMIT $2 OFFSET $3
 `
 

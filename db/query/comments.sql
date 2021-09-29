@@ -6,5 +6,5 @@ RETURNING *;
 SELECT *
 FROM comments
 WHERE post_id = $1
-ORDER BY id DESC
+ORDER BY id
 LIMIT $2 OFFSET $3;
