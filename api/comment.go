@@ -59,3 +59,39 @@ func (server *Server) createComment(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, comment)
 }
+
+type listCommentsRequest struct {
+	PostID int64 `uri:"postId" binding:"required,min=1"`
+}
+type listCommentsParams struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=1,max=100"`
+}
+
+func (server *Server) listComments(ctx *gin.Context) {
+	var req listCommentsRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	var param listCommentsParams
+	if err := ctx.ShouldBindQuery(&param); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	arg := db.ListCommentsParams{
+		PostID: req.PostID,
+		Limit:  param.PageSize,
+		Offset: (param.PageID - 1) * param.PageSize,
+	}
+	comments, err := server.store.ListComments(ctx, arg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, comments)
+}
