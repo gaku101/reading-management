@@ -71,6 +71,7 @@ func (server *Server) setupRouter() {
 	authRoutes.POST("/follow", server.createFollow)
 	authRoutes.GET("/follow/:followingId", server.getFollow)
 	authRoutes.GET("/follow", server.listFollow)
+	authRoutes.DELETE("/follow/:followingId", server.deleteFollow)
 
 	authRoutes.POST("/comments", server.createComment)
 	authRoutes.GET("/comments/:postId", server.listComments)

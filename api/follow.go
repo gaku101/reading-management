@@ -125,3 +125,40 @@ func (server *Server) listFollow(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, follow)
 }
+
+type deleteFollowRequest struct {
+	FollowongID int64 `uri:"followingId" binding:"required,min=1"`
+}
+
+func (server *Server) deleteFollow(ctx *gin.Context) {
+	var req deleteFollowRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg := db.DeleteFollowParams{
+		FollowingID: req.FollowongID,
+		FollowerID:  user.ID,
+	}
+	err = server.store.DeleteFollow(ctx, arg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	// ctx.JSON(http.StatusOK, follow)
+}
