@@ -18,3 +18,7 @@ FROM follow
   AND follower_id = $1
 ORDER BY id DESC
 LIMIT $2 OFFSET $3;
+-- name: DeleteFollow :exec
+DELETE FROM follow
+WHERE following_id = $1
+  AND follower_id = $2;
