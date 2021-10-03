@@ -149,15 +149,27 @@ func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams)
 
 		result.Comments, err = q.DeleteComments(ctx, arg.ID)
 		if err != nil {
-			return err
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v on Comments not set", arg.ID)
+			} else {
+				return err
+			}
 		}
 		result.PostFavorites, err = q.DeletePostFavorite(ctx, arg.ID)
 		if err != nil {
-			return err
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v on PostFavorites not set", arg.ID)
+			} else {
+				return err
+			}
 		}
 		result.PostCategory, err = q.DeletePostCategory(ctx, arg.ID)
 		if err != nil {
-			return err
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v on PostCategory not set", arg.ID)
+			} else {
+				return err
+			}
 		}
 		result.Post, err = q.DeletePost(ctx, arg.ID)
 		if err != nil {
