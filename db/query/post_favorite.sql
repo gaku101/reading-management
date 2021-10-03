@@ -24,3 +24,7 @@ LIMIT 1;
 SELECT id
 FROM post_favorites
 WHERE post_id = $1;
+-- name: DeletePostFavorite :one
+DELETE FROM post_favorites
+WHERE post_id = $1
+RETURNING *;

@@ -25,6 +25,19 @@ func (q *Queries) CreatePostCategory(ctx context.Context, arg CreatePostCategory
 	return i, err
 }
 
+const deletePostCategory = `-- name: DeletePostCategory :one
+DELETE FROM post_category
+WHERE post_id = $1
+RETURNING id, post_id, category_id
+`
+
+func (q *Queries) DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error) {
+	row := q.db.QueryRowContext(ctx, deletePostCategory, postID)
+	var i PostCategory
+	err := row.Scan(&i.ID, &i.PostID, &i.CategoryID)
+	return i, err
+}
+
 const getPostCategory = `-- name: GetPostCategory :one
 SELECT category.id,
   name

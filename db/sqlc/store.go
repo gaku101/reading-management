@@ -10,6 +10,7 @@ import (
 type Store interface {
 	Querier
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+	DeletePostTx(ctx context.Context, arg DeletePostTxParams) (DeletePostTxResult, error)
 }
 
 //SQLStore provides all functions to execute SQL queries and transaction
@@ -127,4 +128,44 @@ func addMoney(
 		Amount: amount2,
 	})
 	return
+}
+
+type DeletePostTxParams struct {
+	ID int64 `json:"id"`
+}
+
+type DeletePostTxResult struct {
+	Post          Post         `json:"post"`
+	Comments      Comment      `json:"comments"`
+	PostFavorites PostFavorite `json:"post_favorites"`
+	PostCategory  PostCategory `json:"post_category"`
+}
+
+func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams) (DeletePostTxResult, error) {
+	var result DeletePostTxResult
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.Comments, err = q.DeleteComments(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+		result.PostFavorites, err = q.DeletePostFavorite(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+		result.PostCategory, err = q.DeletePostCategory(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+		result.Post, err = q.DeletePost(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+
+		return err
+	})
+
+	return result, err
 }

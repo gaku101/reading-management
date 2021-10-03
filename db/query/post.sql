@@ -25,3 +25,7 @@ SET title = $2,
   body = $3
 WHERE id = $1
 RETURNING *;
+-- name: DeletePost :one
+DELETE FROM posts
+WHERE id = $1
+RETURNING *;
