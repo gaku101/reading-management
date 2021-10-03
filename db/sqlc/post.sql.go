@@ -33,6 +33,26 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
+const deletePost = `-- name: DeletePost :one
+DELETE FROM posts
+WHERE id = $1
+RETURNING id, author, title, body, created_at, updated_at
+`
+
+func (q *Queries) DeletePost(ctx context.Context, id int64) (Post, error) {
+	row := q.db.QueryRowContext(ctx, deletePost, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Author,
+		&i.Title,
+		&i.Body,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getPost = `-- name: GetPost :one
 SELECT id, author, title, body, created_at, updated_at
 FROM posts

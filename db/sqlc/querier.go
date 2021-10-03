@@ -19,7 +19,11 @@ type Querier interface {
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, id int64) error
+	DeleteComments(ctx context.Context, postID int64) (Comment, error)
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
+	DeletePost(ctx context.Context, id int64) (Post, error)
+	DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error)
+	DeletePostFavorite(ctx context.Context, postID int64) (PostFavorite, error)
 	GetAccount(ctx context.Context, id int64) (Account, error)
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)

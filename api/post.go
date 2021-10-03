@@ -339,3 +339,44 @@ func (server *Server) getFavoriteCount(ctx *gin.Context, postId int64) []int64 {
 	}
 	return postFavorite
 }
+
+type deletePostRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) deletePost(ctx *gin.Context) {
+	var req deletePostRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	post, err := server.store.GetPost(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	if post.Author != authPayload.Username {
+		err := errors.New("Not allowed to delete other user's post")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.DeletePostTxParams{
+		ID: req.ID,
+	}
+
+	result, err := server.store.DeletePostTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
+}
