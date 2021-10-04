@@ -76,6 +76,7 @@ func (server *Server) setupRouter() {
 
 	authRoutes.POST("/comments", server.createComment)
 	authRoutes.GET("/comments/:postId", server.listComments)
+	authRoutes.DELETE("/comments/:id", server.deleteComment)
 
 	server.router = router
 }

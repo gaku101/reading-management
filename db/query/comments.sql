@@ -16,3 +16,10 @@ RETURNING *;
 SELECT id
 FROM comments
 WHERE post_id = $1;
+-- name: DeleteComment :exec
+DELETE FROM comments
+WHERE id = $1;
+-- name: GetComment :one
+SELECT *
+FROM comments
+WHERE id = $1;

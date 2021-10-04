@@ -132,3 +132,41 @@ func (server *Server) listComments(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response)
 }
+
+type deleteCommentRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) deleteComment(ctx *gin.Context) {
+	var req deleteCommentRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	comment, err := server.store.GetComment(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	if comment.Author != authPayload.Username {
+		err := errors.New("Not allowed to other user's comment")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+	err = server.store.DeleteComment(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+}

@@ -214,6 +214,20 @@ func (mr *MockStoreMockRecorder) DeleteAccount(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockStore)(nil).DeleteAccount), arg0, arg1)
 }
 
+// DeleteComment mocks base method.
+func (m *MockStore) DeleteComment(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteComment", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteComment indicates an expected call of DeleteComment.
+func (mr *MockStoreMockRecorder) DeleteComment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteComment", reflect.TypeOf((*MockStore)(nil).DeleteComment), arg0, arg1)
+}
+
 // DeleteComments mocks base method.
 func (m *MockStore) DeleteComments(arg0 context.Context, arg1 int64) (db.Comment, error) {
 	m.ctrl.T.Helper()
@@ -361,6 +375,21 @@ func (m *MockStore) GetCategory(arg0 context.Context, arg1 int64) (db.Category, 
 func (mr *MockStoreMockRecorder) GetCategory(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCategory", reflect.TypeOf((*MockStore)(nil).GetCategory), arg0, arg1)
+}
+
+// GetComment mocks base method.
+func (m *MockStore) GetComment(arg0 context.Context, arg1 int64) (db.Comment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetComment", arg0, arg1)
+	ret0, _ := ret[0].(db.Comment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetComment indicates an expected call of GetComment.
+func (mr *MockStoreMockRecorder) GetComment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComment", reflect.TypeOf((*MockStore)(nil).GetComment), arg0, arg1)
 }
 
 // GetCommentsId mocks base method.

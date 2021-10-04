@@ -32,6 +32,16 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	return i, err
 }
 
+const deleteComment = `-- name: DeleteComment :exec
+DELETE FROM comments
+WHERE id = $1
+`
+
+func (q *Queries) DeleteComment(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteComment, id)
+	return err
+}
+
 const deleteComments = `-- name: DeleteComments :one
 DELETE FROM comments
 WHERE post_id = $1
@@ -40,6 +50,25 @@ RETURNING id, post_id, body, created_at, author
 
 func (q *Queries) DeleteComments(ctx context.Context, postID int64) (Comment, error) {
 	row := q.db.QueryRowContext(ctx, deleteComments, postID)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.PostID,
+		&i.Body,
+		&i.CreatedAt,
+		&i.Author,
+	)
+	return i, err
+}
+
+const getComment = `-- name: GetComment :one
+SELECT id, post_id, body, created_at, author
+FROM comments
+WHERE id = $1
+`
+
+func (q *Queries) GetComment(ctx context.Context, id int64) (Comment, error) {
+	row := q.db.QueryRowContext(ctx, getComment, id)
 	var i Comment
 	err := row.Scan(
 		&i.ID,
