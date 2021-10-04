@@ -105,7 +105,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 			return
 		}
 		favorites := len(server.getFavoriteCount(ctx, post.ID))
-		rsp := newPostResponse(post, category, authorImage, favorites)
+		rsp := newPostResponse(post, category, authorImage, favorites, 0)
 		response = append(response, rsp)
 	}
 

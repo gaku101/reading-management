@@ -28,6 +28,7 @@ type Querier interface {
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
+	GetCommentsId(ctx context.Context, postID int64) ([]int64, error)
 	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetFollow(ctx context.Context, arg GetFollowParams) (Follow, error)
 	GetMyFavoritePost(ctx context.Context, arg GetMyFavoritePostParams) (PostFavorite, error)

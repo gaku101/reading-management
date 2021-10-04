@@ -51,6 +51,35 @@ func (q *Queries) DeleteComments(ctx context.Context, postID int64) (Comment, er
 	return i, err
 }
 
+const getCommentsId = `-- name: GetCommentsId :many
+SELECT id
+FROM comments
+WHERE post_id = $1
+`
+
+func (q *Queries) GetCommentsId(ctx context.Context, postID int64) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, getCommentsId, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []int64{}
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listComments = `-- name: ListComments :many
 SELECT id, post_id, body, created_at, author
 FROM comments
