@@ -189,7 +189,9 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 
 		}
 		postFavorite := len(server.getFavoriteCount(ctx, post.ID))
-		rsp := newPostResponse(post, category, "", postFavorite, 0)
+		commentsNum := server.getCommentsCount(ctx, post.ID)
+
+		rsp := newPostResponse(post, category, "", postFavorite, commentsNum)
 		response = append(response, rsp)
 	}
 
@@ -239,16 +241,9 @@ func (server *Server) listPosts(ctx *gin.Context) {
 			return
 		}
 		favorites := len(server.getFavoriteCount(ctx, post.ID))
-		commentsNum, err := server.store.GetCommentsId(ctx, post.ID)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				fmt.Printf("post_id = %v's comments not set", post.ID)
-			} else {
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-		}
-		rsp := newPostResponse(post, category, authorImage, favorites, len(commentsNum))
+		commentsNum := server.getCommentsCount(ctx, post.ID)
+
+		rsp := newPostResponse(post, category, authorImage, favorites, commentsNum)
 		response = append(response, rsp)
 	}
 
@@ -349,6 +344,18 @@ func (server *Server) getFavoriteCount(ctx *gin.Context, postId int64) []int64 {
 		return postFavorite
 	}
 	return postFavorite
+}
+func (server *Server) getCommentsCount(ctx *gin.Context, postId int64) int {
+	comments, err := server.store.GetCommentsId(ctx, postId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Printf("post_id = %v's comments not set", postId)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return len(comments)
+		}
+	}
+	return len(comments)
 }
 
 type deletePostRequest struct {
