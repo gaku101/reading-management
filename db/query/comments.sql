@@ -12,3 +12,7 @@ LIMIT $2 OFFSET $3;
 DELETE FROM comments
 WHERE post_id = $1
 RETURNING *;
+-- name: GetCommentsId :many
+SELECT id
+FROM comments
+WHERE post_id = $1;
