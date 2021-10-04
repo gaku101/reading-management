@@ -19,6 +19,7 @@ type Querier interface {
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, id int64) error
+	DeleteComment(ctx context.Context, id int64) error
 	DeleteComments(ctx context.Context, postID int64) (Comment, error)
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
 	DeletePost(ctx context.Context, id int64) (Post, error)
@@ -28,6 +29,7 @@ type Querier interface {
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
+	GetComment(ctx context.Context, id int64) (Comment, error)
 	GetCommentsId(ctx context.Context, postID int64) ([]int64, error)
 	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetFollow(ctx context.Context, arg GetFollowParams) (Follow, error)
