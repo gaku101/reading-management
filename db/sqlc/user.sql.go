@@ -105,27 +105,46 @@ func (q *Queries) GetUserImage(ctx context.Context, username string) (string, er
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
-SET username = $2,
-  profile = $3,
-  image = $4
+SET profile = $2
 WHERE id = $1
 RETURNING id, username, hashed_password, email, profile, image, password_changed_at, created_at
 `
 
 type UpdateUserParams struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Profile  string `json:"profile"`
-	Image    string `json:"image"`
+	ID      int64  `json:"id"`
+	Profile string `json:"profile"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updateUser,
-		arg.ID,
-		arg.Username,
-		arg.Profile,
-		arg.Image,
+	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.Profile)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Email,
+		&i.Profile,
+		&i.Image,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
 	)
+	return i, err
+}
+
+const updateUserImage = `-- name: UpdateUserImage :one
+UPDATE users
+SET image = $2
+WHERE id = $1
+RETURNING id, username, hashed_password, email, profile, image, password_changed_at, created_at
+`
+
+type UpdateUserImageParams struct {
+	ID    int64  `json:"id"`
+	Image string `json:"image"`
+}
+
+func (q *Queries) UpdateUserImage(ctx context.Context, arg UpdateUserImageParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserImage, arg.ID, arg.Image)
 	var i User
 	err := row.Scan(
 		&i.ID,

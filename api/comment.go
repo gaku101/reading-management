@@ -118,6 +118,7 @@ func (server *Server) listComments(ctx *gin.Context) {
 	for i := range comments {
 		comment := comments[i]
 		authorImage, err := server.store.GetUserImage(ctx, comment.Author)
+		preUrl := getPresignedUrl(authorImage)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -127,7 +128,7 @@ func (server *Server) listComments(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		rsp := newCommentResponse(comment, authorImage)
+		rsp := newCommentResponse(comment, preUrl)
 		response = append(response, rsp)
 	}
 	ctx.JSON(http.StatusOK, response)

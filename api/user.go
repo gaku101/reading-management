@@ -3,10 +3,15 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	db "github.com/gaku101/my-portfolio/db/sqlc"
+	"github.com/gaku101/my-portfolio/infrastructure"
 	"github.com/gaku101/my-portfolio/token"
 	"github.com/gaku101/my-portfolio/util"
 	"github.com/gin-gonic/gin"
@@ -37,7 +42,7 @@ func newUserResponse(user db.User) userResponse {
 		Username:          user.Username,
 		Email:             user.Email,
 		Profile:           user.Profile,
-		Image:             user.Image,
+		Image:             getPresignedUrl(user.Image),
 		PasswordChangedAt: user.PasswordChangedAt,
 		CreatedAt:         user.CreatedAt,
 	}
@@ -164,7 +169,6 @@ type updateUserRequest struct {
 	ID       int64  `json:"id" binding:"required,min=1"`
 	Username string `json:"username" binding:"required,alphanum"`
 	Profile  string `json:"profile"`
-	Image    string `json:"image"`
 }
 
 func (server *Server) updateUser(ctx *gin.Context) {
@@ -187,10 +191,8 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	arg := db.UpdateUserParams{
-		ID:       req.ID,
-		Username: req.Username,
-		Profile:  req.Profile,
-		Image:    req.Image,
+		ID:      req.ID,
+		Profile: req.Profile,
 	}
 
 	user, err := server.store.UpdateUser(ctx, arg)
@@ -218,4 +220,26 @@ func (server *Server) validUser(ctx *gin.Context, username string) (db.User, boo
 	}
 
 	return user, true
+}
+
+func getPresignedUrl(image string) string {
+	if !strings.Contains(image, "amazonaws") {
+		return image
+	}
+	awsS3 := infrastructure.NewAwsS3()
+	svc := awsS3.Svc
+	slice := strings.Split(image, awsS3.Keys.Folder+"/")
+	fileName := slice[1]
+	s3req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(awsS3.Config.Aws.S3.Bucket),
+		Key:    aws.String(awsS3.Keys.Folder + "/" + fileName),
+	})
+	urlStr, err := s3req.Presign(120 * time.Minute)
+
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+
+	log.Println("Pre signed url : ", urlStr)
+	return urlStr
 }
