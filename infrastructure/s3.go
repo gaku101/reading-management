@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -14,6 +15,7 @@ type AwsS3 struct {
 	Config   *Config
 	Keys     AwsS3URLs
 	Uploader *s3manager.Uploader
+	Svc *s3.S3
 }
 
 type AwsS3URLs struct {
@@ -38,6 +40,7 @@ func NewAwsS3() *AwsS3 {
 		},
 		// Create an uploader with the session and default options
 		Uploader: s3manager.NewUploader(sess),
+		Svc: s3.New(sess),
 	}
 }
 
@@ -74,6 +77,5 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 	if err != nil {
 		return "", fmt.Errorf("failed to upload file, %v", err)
 	}
-
 	return result.Location, nil
 }

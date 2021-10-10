@@ -95,6 +95,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 
 		}
 		authorImage, err := server.store.GetUserImage(ctx, post.Author)
+		preUrl := getPresignedUrl(authorImage)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -106,7 +107,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 		}
 		favorites := len(server.getFavoriteCount(ctx, post.ID))
 		commentsNum := server.getCommentsCount(ctx, post.ID)
-		rsp := newPostResponse(post, category, authorImage, favorites, commentsNum)
+		rsp := newPostResponse(post, category, preUrl, favorites, commentsNum)
 		response = append(response, rsp)
 	}
 
