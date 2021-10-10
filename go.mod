@@ -3,6 +3,7 @@ module github.com/gaku101/my-portfolio
 go 1.16
 
 require (
+	github.com/aws/aws-sdk-go v1.40.58
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.4
 	github.com/golang/mock v1.5.0
