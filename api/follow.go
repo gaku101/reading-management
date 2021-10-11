@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
@@ -114,7 +115,7 @@ func (server *Server) listFollow(ctx *gin.Context) {
 		Limit:      param.PageSize,
 		Offset:     (param.PageID - 1) * param.PageSize,
 	}
-	follow, err := server.store.ListFollow(ctx, arg)
+	followings, err := server.store.ListFollow(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -123,7 +124,23 @@ func (server *Server) listFollow(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, follow)
+	var response []db.ListFollowRow
+	for i := range followings {
+		follow := followings[i]
+		preUrl := getPresignedUrl(follow.Image)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		follow.Image = preUrl
+		response = append(response, follow)
+	}
+	ctx.JSON(http.StatusOK, response)
 }
 
 type deleteFollowRequest struct {
