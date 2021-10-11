@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"regexp"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
 	"github.com/gaku101/my-portfolio/infrastructure"
@@ -34,8 +35,9 @@ func (server *Server) uploadImage(ctx *gin.Context) {
 			err := errors.New("fileName is required")
 			ctx.JSON(400, gin.H{"message": err.Error()})
 		}
+		re1 := regexp.MustCompile("[^`><{}][()#%~|&$@=;: +,?\\\\]")
+		fileName = re1.ReplaceAllString(fileName, "")
 		ext := filepath.Ext(fileName)
-		fmt.Printf("ext %+v", ext)
 		uploadFile, err := file.Open()
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": err.Error()})
