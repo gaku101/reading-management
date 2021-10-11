@@ -57,6 +57,7 @@ func (server *Server) uploadImage(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, user)
+		rsp := newUserResponse(user)
+		ctx.JSON(http.StatusOK, rsp)
 	}
 }
