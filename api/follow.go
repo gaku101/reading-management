@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
