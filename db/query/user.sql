@@ -20,7 +20,7 @@ RETURNING *;
 -- name: UpdateUserImage :one
 UPDATE users
 SET image = $2
-WHERE id = $1
+WHERE username = $1
 RETURNING *;
 -- name: GetUserImage :one
 SELECT image

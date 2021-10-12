@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"mime/multipart"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -15,7 +16,7 @@ type AwsS3 struct {
 	Config   *Config
 	Keys     AwsS3URLs
 	Uploader *s3manager.Uploader
-	Svc *s3.S3
+	Svc      *s3.S3
 }
 
 type AwsS3URLs struct {
@@ -40,7 +41,7 @@ func NewAwsS3() *AwsS3 {
 		},
 		// Create an uploader with the session and default options
 		Uploader: s3manager.NewUploader(sess),
-		Svc: s3.New(sess),
+		Svc:      s3.New(sess),
 	}
 }
 
@@ -67,9 +68,9 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 
 	// Upload the file to S3.
 	result, err := a.Uploader.Upload(&s3manager.UploadInput{
-		ACL:    aws.String("public-read"),
-		Body:   file,
-		Bucket: aws.String(a.Config.Aws.S3.Bucket),
+		ACL:         aws.String("public-read"),
+		Body:        file,
+		Bucket:      aws.String(a.Config.Aws.S3.Bucket),
 		ContentType: aws.String(contentType),
 		Key:         aws.String(a.Keys.Folder + "/" + fileName),
 	})
@@ -78,4 +79,21 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 		return "", fmt.Errorf("failed to upload file, %v", err)
 	}
 	return result.Location, nil
+}
+func (a *AwsS3) Delete(url string) (err error) {
+	svc := a.Svc
+	// オブジェクトurlのファイル名の部分を取得
+	arr1 := strings.Split(url, "/")
+	fileName := arr1[len(arr1)-1]
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(a.Config.Aws.S3.Bucket), Key: aws.String(a.Keys.Folder + "/" + fileName)})
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(a.Config.Aws.S3.Bucket),
+		Key:    aws.String(a.Keys.Folder + "/" + fileName),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete file, %v", err)
+	}
+	return nil
 }
