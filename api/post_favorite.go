@@ -5,12 +5,39 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
 	"github.com/gaku101/my-portfolio/token"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
+
+type postFavoriteResponse struct {
+	Id          int64       `json:"id"`
+	Author      string      `json:"author"`
+	Title       string      `json:"title"`
+	Category    db.Category `json:"category"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	AuthorImage string      `json:"authorImage"`
+	Favorites   int         `json:"favorites"`
+	CommentsNum int         `json:"commentsNum"`
+}
+
+func newPostFavoriteResponse(post db.ListFavoritePostsRow, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
+	return postResponse{
+		Id:          post.ID,
+		Author:      post.Author,
+		Title:       post.Title,
+		Category:    category,
+		CreatedAt:   post.CreatedAt,
+		UpdatedAt:   post.UpdatedAt,
+		AuthorImage: authorImage,
+		Favorites:   favorites,
+		CommentsNum: commentsNum,
+	}
+}
 
 type createPostFavoriteRequest struct {
 	PostID int64 `json:"postId" binding:"required,min=1"`
@@ -107,7 +134,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 		}
 		favorites := len(server.getFavoriteCount(ctx, post.ID))
 		commentsNum := server.getCommentsCount(ctx, post.ID)
-		rsp := newPostResponse(post, category, preUrl, favorites, commentsNum)
+		rsp := newPostFavoriteResponse(post, category, preUrl, favorites, commentsNum)
 		response = append(response, rsp)
 	}
 

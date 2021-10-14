@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createPostFavorite = `-- name: CreatePostFavorite :one
@@ -91,7 +92,6 @@ const listFavoritePosts = `-- name: ListFavoritePosts :many
 SELECT posts.id,
   author,
   title,
-  body,
   created_at,
   updated_at
 FROM posts
@@ -107,20 +107,27 @@ type ListFavoritePostsParams struct {
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]Post, error) {
+type ListFavoritePostsRow struct {
+	ID        int64     `json:"id"`
+	Author    string    `json:"author"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (q *Queries) ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]ListFavoritePostsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listFavoritePosts, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Post{}
+	items := []ListFavoritePostsRow{}
 	for rows.Next() {
-		var i Post
+		var i ListFavoritePostsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Author,
 			&i.Title,
-			&i.Body,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

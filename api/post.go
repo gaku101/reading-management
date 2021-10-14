@@ -13,38 +13,47 @@ import (
 	"github.com/lib/pq"
 )
 
-type createPostRequest struct {
-	Author     string `json:"author" binding:"required,alphanum"`
-	Title      string `json:"title" binding:"required"`
-	Body       string `json:"body" binding:"required"`
-	CategoryID int64  `json:"categoryId"`
-}
 type postResponse struct {
-	Id          int64       `json:"id"`
-	Author      string      `json:"author"`
-	Title       string      `json:"title"`
-	Body        string      `json:"body"`
-	Category    db.Category `json:"category"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-	AuthorImage string      `json:"authorImage"`
-	Favorites   int         `json:"favorites"`
-	CommentsNum int         `json:"commentsNum"`
+	Id           int64       `json:"id"`
+	Author       string      `json:"author"`
+	Title        string      `json:"title"`
+	BookAuthor   string      `json:"bookAuthor"`
+	BookImage    string      `json:"bookImage"`
+	BookPage     int16       `json:"bookPage"`
+	BookPageRead int16       `json:"bookPageRead"`
+	Category     db.Category `json:"category"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
+	AuthorImage  string      `json:"authorImage"`
+	Favorites    int         `json:"favorites"`
+	CommentsNum  int         `json:"commentsNum"`
 }
 
 func newPostResponse(post db.Post, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
 	return postResponse{
-		Id:          post.ID,
-		Author:      post.Author,
-		Title:       post.Title,
-		Body:        post.Body,
-		Category:    category,
-		CreatedAt:   post.CreatedAt,
-		UpdatedAt:   post.UpdatedAt,
-		AuthorImage: authorImage,
-		Favorites:   favorites,
-		CommentsNum: commentsNum,
+		Id:           post.ID,
+		Author:       post.Author,
+		Title:        post.Title,
+		Category:     category,
+		BookAuthor:   post.BookAuthor,
+		BookImage:    post.BookImage,
+		BookPage:     post.BookPage,
+		BookPageRead: post.BookPageRead,
+		CreatedAt:    post.CreatedAt,
+		UpdatedAt:    post.UpdatedAt,
+		AuthorImage:  authorImage,
+		Favorites:    favorites,
+		CommentsNum:  commentsNum,
 	}
+}
+
+type createPostRequest struct {
+	Author     string `json:"author" binding:"required,alphanum"`
+	Title      string `json:"title" binding:"required"`
+	CategoryID int64  `json:"categoryId"`
+	BookAuthor string `json:"bookAuthor"`
+	BookImage  string `json:"bookImage" `
+	BookPage   int16  `json:"bookPage" `
 }
 
 func (server *Server) createPost(ctx *gin.Context) {
@@ -66,9 +75,12 @@ func (server *Server) createPost(ctx *gin.Context) {
 	}
 
 	arg := db.CreatePostParams{
-		Author: req.Author,
-		Title:  req.Title,
-		Body:   req.Body,
+		Author:       req.Author,
+		Title:        req.Title,
+		BookAuthor:   req.BookAuthor,
+		BookImage:    req.BookImage,
+		BookPage:     req.BookPage,
+		BookPageRead: 0,
 	}
 
 	post, err := server.store.CreatePost(ctx, arg)
@@ -255,7 +267,6 @@ type updatePostRequest struct {
 	ID         int64  `json:"id" binding:"required,min=1"`
 	Author     string `json:"author" binding:"required,alphanum"`
 	Title      string `json:"title"`
-	Body       string `json:"body"`
 	CategoryID int64  `json:"categoryId"`
 }
 
@@ -281,7 +292,6 @@ func (server *Server) updatePost(ctx *gin.Context) {
 	arg := db.UpdatePostParams{
 		ID:    req.ID,
 		Title: req.Title,
-		Body:  req.Body,
 	}
 
 	post, err := server.store.UpdatePost(ctx, arg)

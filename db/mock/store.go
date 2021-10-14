@@ -603,10 +603,10 @@ func (mr *MockStoreMockRecorder) ListEntries(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // ListFavoritePosts mocks base method.
-func (m *MockStore) ListFavoritePosts(arg0 context.Context, arg1 db.ListFavoritePostsParams) ([]db.Post, error) {
+func (m *MockStore) ListFavoritePosts(arg0 context.Context, arg1 db.ListFavoritePostsParams) ([]db.ListFavoritePostsRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListFavoritePosts", arg0, arg1)
-	ret0, _ := ret[0].([]db.Post)
+	ret0, _ := ret[0].([]db.ListFavoritePostsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -44,7 +44,7 @@ type Querier interface {
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
-	ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]Post, error)
+	ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]ListFavoritePostsRow, error)
 	ListFollow(ctx context.Context, arg ListFollowParams) ([]ListFollowRow, error)
 	ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Post, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
