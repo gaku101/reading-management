@@ -6,6 +6,7 @@ RETURNING *;
 SELECT posts.id,
   author,
   title,
+  book_image,
   created_at,
   updated_at
 FROM posts

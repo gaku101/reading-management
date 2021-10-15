@@ -92,6 +92,7 @@ const listFavoritePosts = `-- name: ListFavoritePosts :many
 SELECT posts.id,
   author,
   title,
+  book_image,
   created_at,
   updated_at
 FROM posts
@@ -111,6 +112,7 @@ type ListFavoritePostsRow struct {
 	ID        int64     `json:"id"`
 	Author    string    `json:"author"`
 	Title     string    `json:"title"`
+	BookImage string    `json:"book_image"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -128,6 +130,7 @@ func (q *Queries) ListFavoritePosts(ctx context.Context, arg ListFavoritePostsPa
 			&i.ID,
 			&i.Author,
 			&i.Title,
+			&i.BookImage,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

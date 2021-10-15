@@ -17,6 +17,7 @@ type postFavoriteResponse struct {
 	Id          int64       `json:"id"`
 	Author      string      `json:"author"`
 	Title       string      `json:"title"`
+	BookImage   string      `json:"bookImage"`
 	Category    db.Category `json:"category"`
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
@@ -30,6 +31,7 @@ func newPostFavoriteResponse(post db.ListFavoritePostsRow, category db.Category,
 		Id:          post.ID,
 		Author:      post.Author,
 		Title:       post.Title,
+		BookImage:   post.BookImage,
 		Category:    category,
 		CreatedAt:   post.CreatedAt,
 		UpdatedAt:   post.UpdatedAt,
