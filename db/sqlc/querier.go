@@ -48,6 +48,7 @@ type Querier interface {
 	ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]ListFavoritePostsRow, error)
 	ListFollow(ctx context.Context, arg ListFollowParams) ([]ListFollowRow, error)
 	ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Post, error)
+	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)

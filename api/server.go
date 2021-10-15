@@ -81,6 +81,7 @@ func (server *Server) setupRouter() {
 	authRoutes.POST("/images/:username", server.uploadImage)
 
 	authRoutes.POST("/notes", server.createNote)
+	authRoutes.GET("/notes/:postId", server.listNotes)
 
 
 	server.router = router

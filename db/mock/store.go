@@ -662,6 +662,21 @@ func (mr *MockStoreMockRecorder) ListMyPosts(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMyPosts", reflect.TypeOf((*MockStore)(nil).ListMyPosts), arg0, arg1)
 }
 
+// ListNotes mocks base method.
+func (m *MockStore) ListNotes(arg0 context.Context, arg1 db.ListNotesParams) ([]db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListNotes", arg0, arg1)
+	ret0, _ := ret[0].([]db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListNotes indicates an expected call of ListNotes.
+func (mr *MockStoreMockRecorder) ListNotes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNotes", reflect.TypeOf((*MockStore)(nil).ListNotes), arg0, arg1)
+}
+
 // ListPosts mocks base method.
 func (m *MockStore) ListPosts(arg0 context.Context, arg1 db.ListPostsParams) ([]db.Post, error) {
 	m.ctrl.T.Helper()
