@@ -41,3 +41,48 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	)
 	return i, err
 }
+
+const listNotes = `-- name: ListNotes :many
+SELECT id, author, post_id, body, page, line, created_at
+FROM notes
+WHERE post_id = $1
+ORDER BY id
+LIMIT $2 OFFSET $3
+`
+
+type ListNotesParams struct {
+	PostID int64 `json:"post_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error) {
+	rows, err := q.db.QueryContext(ctx, listNotes, arg.PostID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Note{}
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Author,
+			&i.PostID,
+			&i.Body,
+			&i.Page,
+			&i.Line,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
