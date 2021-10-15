@@ -80,6 +80,8 @@ func (server *Server) setupRouter() {
 
 	authRoutes.POST("/images/:username", server.uploadImage)
 
+	authRoutes.POST("/notes", server.createNote)
+
 
 	server.router = router
 }

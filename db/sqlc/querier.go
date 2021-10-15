@@ -13,6 +13,7 @@ type Querier interface {
 	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
 	CreateFollow(ctx context.Context, arg CreateFollowParams) (Follow, error)
+	CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreatePostCategory(ctx context.Context, arg CreatePostCategoryParams) (PostCategory, error)
 	CreatePostFavorite(ctx context.Context, arg CreatePostFavoriteParams) (PostFavorite, error)
