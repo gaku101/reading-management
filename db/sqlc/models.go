@@ -40,13 +40,26 @@ type Follow struct {
 	FollowerID  int64 `json:"follower_id"`
 }
 
-type Post struct {
+type Note struct {
 	ID        int64     `json:"id"`
 	Author    string    `json:"author"`
-	Title     string    `json:"title"`
+	PostID    int64     `json:"post_id"`
 	Body      string    `json:"body"`
+	Page      int16     `json:"page"`
+	Line      int16     `json:"line"`
 	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type Post struct {
+	ID           int64     `json:"id"`
+	Author       string    `json:"author"`
+	Title        string    `json:"title"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	BookAuthor   string    `json:"book_author"`
+	BookImage    string    `json:"book_image"`
+	BookPage     int16     `json:"book_page"`
+	BookPageRead int16     `json:"book_page_read"`
 }
 
 type PostCategory struct {

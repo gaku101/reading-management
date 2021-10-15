@@ -1,6 +1,13 @@
 -- name: CreatePost :one
-INSERT INTO posts (author, title, body)
-VALUES ($1, $2, $3)
+INSERT INTO posts (
+    author,
+    title,
+    book_author,
+    book_image,
+    book_page,
+    book_page_read
+  )
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 -- name: GetPost :one
 SELECT *
@@ -21,8 +28,7 @@ ORDER BY id DESC
 LIMIT $2 OFFSET $3;
 -- name: UpdatePost :one
 UPDATE posts
-SET title = $2,
-  body = $3
+SET title = $2
 WHERE id = $1
 RETURNING *;
 -- name: DeletePost :one
