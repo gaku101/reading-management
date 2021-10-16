@@ -42,6 +42,49 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	return i, err
 }
 
+const deleteNote = `-- name: DeleteNote :one
+DELETE FROM notes
+WHERE id = $1
+RETURNING id, author, post_id, body, page, line, created_at
+`
+
+func (q *Queries) DeleteNote(ctx context.Context, id int64) (Note, error) {
+	row := q.db.QueryRowContext(ctx, deleteNote, id)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Author,
+		&i.PostID,
+		&i.Body,
+		&i.Page,
+		&i.Line,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getNote = `-- name: GetNote :one
+SELECT id, author, post_id, body, page, line, created_at
+FROM notes
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetNote(ctx context.Context, id int64) (Note, error) {
+	row := q.db.QueryRowContext(ctx, getNote, id)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Author,
+		&i.PostID,
+		&i.Body,
+		&i.Page,
+		&i.Line,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const listNotes = `-- name: ListNotes :many
 SELECT id, author, post_id, body, page, line, created_at
 FROM notes
@@ -85,4 +128,40 @@ func (q *Queries) ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, e
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateNote = `-- name: UpdateNote :one
+UPDATE notes
+SET body = $2,
+  page = $3,
+  line = $4
+WHERE id = $1
+RETURNING id, author, post_id, body, page, line, created_at
+`
+
+type UpdateNoteParams struct {
+	ID   int64  `json:"id"`
+	Body string `json:"body"`
+	Page int16  `json:"page"`
+	Line int16  `json:"line"`
+}
+
+func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, updateNote,
+		arg.ID,
+		arg.Body,
+		arg.Page,
+		arg.Line,
+	)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Author,
+		&i.PostID,
+		&i.Body,
+		&i.Page,
+		&i.Line,
+		&i.CreatedAt,
+	)
+	return i, err
 }
