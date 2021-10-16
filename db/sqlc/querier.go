@@ -23,6 +23,7 @@ type Querier interface {
 	DeleteComment(ctx context.Context, id int64) error
 	DeleteComments(ctx context.Context, postID int64) (Comment, error)
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
+	DeleteNote(ctx context.Context, id int64) (Note, error)
 	DeletePost(ctx context.Context, id int64) (Post, error)
 	DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error)
 	DeletePostFavorite(ctx context.Context, postID int64) (PostFavorite, error)
@@ -35,6 +36,7 @@ type Querier interface {
 	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetFollow(ctx context.Context, arg GetFollowParams) (Follow, error)
 	GetMyFavoritePost(ctx context.Context, arg GetMyFavoritePostParams) (PostFavorite, error)
+	GetNote(ctx context.Context, id int64) (Note, error)
 	GetPost(ctx context.Context, id int64) (Post, error)
 	GetPostCategory(ctx context.Context, postID int64) (Category, error)
 	GetPostFavorite(ctx context.Context, postID int64) ([]int64, error)
@@ -52,6 +54,7 @@ type Querier interface {
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
+	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdatePostCategory(ctx context.Context, arg UpdatePostCategoryParams) (PostCategory, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)

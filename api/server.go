@@ -82,6 +82,9 @@ func (server *Server) setupRouter() {
 
 	authRoutes.POST("/notes", server.createNote)
 	authRoutes.GET("/notes/:postId", server.listNotes)
+	authRoutes.PUT("/notes", server.updateNote)
+	authRoutes.DELETE("/notes/:id", server.deleteNote)
+
 
 
 	server.router = router

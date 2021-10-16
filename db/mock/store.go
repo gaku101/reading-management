@@ -272,6 +272,21 @@ func (mr *MockStoreMockRecorder) DeleteFollow(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFollow", reflect.TypeOf((*MockStore)(nil).DeleteFollow), arg0, arg1)
 }
 
+// DeleteNote mocks base method.
+func (m *MockStore) DeleteNote(arg0 context.Context, arg1 int64) (db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteNote", arg0, arg1)
+	ret0, _ := ret[0].(db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteNote indicates an expected call of DeleteNote.
+func (mr *MockStoreMockRecorder) DeleteNote(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNote", reflect.TypeOf((*MockStore)(nil).DeleteNote), arg0, arg1)
+}
+
 // DeletePost mocks base method.
 func (m *MockStore) DeletePost(arg0 context.Context, arg1 int64) (db.Post, error) {
 	m.ctrl.T.Helper()
@@ -465,6 +480,21 @@ func (m *MockStore) GetMyFavoritePost(arg0 context.Context, arg1 db.GetMyFavorit
 func (mr *MockStoreMockRecorder) GetMyFavoritePost(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyFavoritePost", reflect.TypeOf((*MockStore)(nil).GetMyFavoritePost), arg0, arg1)
+}
+
+// GetNote mocks base method.
+func (m *MockStore) GetNote(arg0 context.Context, arg1 int64) (db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNote", arg0, arg1)
+	ret0, _ := ret[0].(db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNote indicates an expected call of GetNote.
+func (mr *MockStoreMockRecorder) GetNote(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNote", reflect.TypeOf((*MockStore)(nil).GetNote), arg0, arg1)
 }
 
 // GetPost mocks base method.
@@ -735,6 +765,21 @@ func (m *MockStore) UpdateAccount(arg0 context.Context, arg1 db.UpdateAccountPar
 func (mr *MockStoreMockRecorder) UpdateAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccount", reflect.TypeOf((*MockStore)(nil).UpdateAccount), arg0, arg1)
+}
+
+// UpdateNote mocks base method.
+func (m *MockStore) UpdateNote(arg0 context.Context, arg1 db.UpdateNoteParams) (db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNote", arg0, arg1)
+	ret0, _ := ret[0].(db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNote indicates an expected call of UpdateNote.
+func (mr *MockStoreMockRecorder) UpdateNote(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNote", reflect.TypeOf((*MockStore)(nil).UpdateNote), arg0, arg1)
 }
 
 // UpdatePost mocks base method.
