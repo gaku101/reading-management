@@ -171,7 +171,7 @@ func (server *Server) deleteNote(ctx *gin.Context) {
 		return
 	}
 
-	note, err = server.store.DeleteNote(ctx, req.ID)
+	err = server.store.DeleteNote(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusOK, nil)

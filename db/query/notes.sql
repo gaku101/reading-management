@@ -20,7 +20,6 @@ SET body = $2,
   line = $4
 WHERE id = $1
 RETURNING *;
--- name: DeleteNote :one
+-- name: DeleteNote :exec
 DELETE FROM notes
-WHERE id = $1
-RETURNING *;
+WHERE id = $1;

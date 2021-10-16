@@ -42,25 +42,14 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	return i, err
 }
 
-const deleteNote = `-- name: DeleteNote :one
+const deleteNote = `-- name: DeleteNote :exec
 DELETE FROM notes
 WHERE id = $1
-RETURNING id, author, post_id, body, page, line, created_at
 `
 
-func (q *Queries) DeleteNote(ctx context.Context, id int64) (Note, error) {
-	row := q.db.QueryRowContext(ctx, deleteNote, id)
-	var i Note
-	err := row.Scan(
-		&i.ID,
-		&i.Author,
-		&i.PostID,
-		&i.Body,
-		&i.Page,
-		&i.Line,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) DeleteNote(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteNote, id)
+	return err
 }
 
 const getNote = `-- name: GetNote :one

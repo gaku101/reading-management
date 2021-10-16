@@ -273,12 +273,11 @@ func (mr *MockStoreMockRecorder) DeleteFollow(arg0, arg1 interface{}) *gomock.Ca
 }
 
 // DeleteNote mocks base method.
-func (m *MockStore) DeleteNote(arg0 context.Context, arg1 int64) (db.Note, error) {
+func (m *MockStore) DeleteNote(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteNote", arg0, arg1)
-	ret0, _ := ret[0].(db.Note)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteNote indicates an expected call of DeleteNote.

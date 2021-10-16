@@ -23,7 +23,7 @@ type Querier interface {
 	DeleteComment(ctx context.Context, id int64) error
 	DeleteComments(ctx context.Context, postID int64) (Comment, error)
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
-	DeleteNote(ctx context.Context, id int64) (Note, error)
+	DeleteNote(ctx context.Context, id int64) error
 	DeletePost(ctx context.Context, id int64) (Post, error)
 	DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error)
 	DeletePostFavorite(ctx context.Context, postID int64) (PostFavorite, error)
