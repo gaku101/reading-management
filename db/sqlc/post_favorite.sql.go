@@ -26,17 +26,20 @@ func (q *Queries) CreatePostFavorite(ctx context.Context, arg CreatePostFavorite
 	return i, err
 }
 
-const deletePostFavorite = `-- name: DeletePostFavorite :one
+const deletePostFavorite = `-- name: DeletePostFavorite :exec
 DELETE FROM post_favorites
 WHERE post_id = $1
-RETURNING id, post_id, user_id
+  AND user_id = $2
 `
 
-func (q *Queries) DeletePostFavorite(ctx context.Context, postID int64) (PostFavorite, error) {
-	row := q.db.QueryRowContext(ctx, deletePostFavorite, postID)
-	var i PostFavorite
-	err := row.Scan(&i.ID, &i.PostID, &i.UserID)
-	return i, err
+type DeletePostFavoriteParams struct {
+	PostID int64 `json:"post_id"`
+	UserID int64 `json:"user_id"`
+}
+
+func (q *Queries) DeletePostFavorite(ctx context.Context, arg DeletePostFavoriteParams) error {
+	_, err := q.db.ExecContext(ctx, deletePostFavorite, arg.PostID, arg.UserID)
+	return err
 }
 
 const getMyFavoritePost = `-- name: GetMyFavoritePost :one

@@ -68,6 +68,7 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/post-favorite/list/:userId", server.listFavoritePosts)
 	authRoutes.GET("/post-favorite/:postId", server.getPostFavorite)
 	authRoutes.POST("/post-favorite", server.createPostFavorite)
+	authRoutes.DELETE("/post-favorite/:postId", server.deletePostFavorite)
 
 	authRoutes.POST("/follow", server.createFollow)
 	authRoutes.GET("/follow/:followingId", server.getFollow)
@@ -84,8 +85,6 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/notes/:postId", server.listNotes)
 	authRoutes.PUT("/notes", server.updateNote)
 	authRoutes.DELETE("/notes/:id", server.deleteNote)
-
-
 
 	server.router = router
 }

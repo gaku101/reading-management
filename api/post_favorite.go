@@ -199,3 +199,39 @@ func (server *Server) authorizedUser(ctx *gin.Context, userId int64) bool {
 
 	return true
 }
+
+type deletePostFavoriteRequest struct {
+	PostID int64 `uri:"postId" binding:"required,min=1"`
+}
+
+func (server *Server) deletePostFavorite(ctx *gin.Context) {
+	var req deletePostFavoriteRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	arg := db.DeletePostFavoriteParams{
+		PostID: req.PostID,
+		UserID: user.ID,
+	}
+	err = server.store.DeletePostFavorite(ctx, arg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+}
