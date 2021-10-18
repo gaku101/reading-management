@@ -27,6 +27,7 @@ type Querier interface {
 	DeletePost(ctx context.Context, id int64) (Post, error)
 	DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error)
 	DeletePostFavorite(ctx context.Context, arg DeletePostFavoriteParams) error
+	DeleteUser(ctx context.Context, username string) error
 	GetAccount(ctx context.Context, id int64) (Account, error)
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
