@@ -42,23 +42,14 @@ func (q *Queries) DeleteComment(ctx context.Context, id int64) error {
 	return err
 }
 
-const deleteComments = `-- name: DeleteComments :one
+const deleteComments = `-- name: DeleteComments :exec
 DELETE FROM comments
 WHERE post_id = $1
-RETURNING id, post_id, body, created_at, author
 `
 
-func (q *Queries) DeleteComments(ctx context.Context, postID int64) (Comment, error) {
-	row := q.db.QueryRowContext(ctx, deleteComments, postID)
-	var i Comment
-	err := row.Scan(
-		&i.ID,
-		&i.PostID,
-		&i.Body,
-		&i.CreatedAt,
-		&i.Author,
-	)
-	return i, err
+func (q *Queries) DeleteComments(ctx context.Context, postID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteComments, postID)
+	return err
 }
 
 const getComment = `-- name: GetComment :one

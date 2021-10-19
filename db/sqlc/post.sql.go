@@ -53,27 +53,14 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
-const deletePost = `-- name: DeletePost :one
+const deletePost = `-- name: DeletePost :exec
 DELETE FROM posts
 WHERE id = $1
-RETURNING id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
 `
 
-func (q *Queries) DeletePost(ctx context.Context, id int64) (Post, error) {
-	row := q.db.QueryRowContext(ctx, deletePost, id)
-	var i Post
-	err := row.Scan(
-		&i.ID,
-		&i.Author,
-		&i.Title,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.BookAuthor,
-		&i.BookImage,
-		&i.BookPage,
-		&i.BookPageRead,
-	)
-	return i, err
+func (q *Queries) DeletePost(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deletePost, id)
+	return err
 }
 
 const getPost = `-- name: GetPost :one
@@ -98,6 +85,45 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 		&i.BookPageRead,
 	)
 	return i, err
+}
+
+const listMyAllPosts = `-- name: ListMyAllPosts :many
+SELECT id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+FROM posts
+WHERE author = $1
+`
+
+func (q *Queries) ListMyAllPosts(ctx context.Context, author string) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, listMyAllPosts, author)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Author,
+			&i.Title,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.BookAuthor,
+			&i.BookImage,
+			&i.BookPage,
+			&i.BookPageRead,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listMyPosts = `-- name: ListMyPosts :many

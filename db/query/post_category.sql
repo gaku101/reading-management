@@ -14,7 +14,6 @@ UPDATE post_category
 SET category_id = $2
 WHERE post_id = $1
 RETURNING *;
--- name: DeletePostCategory :one
+-- name: DeletePostCategory :exec
 DELETE FROM post_category
-WHERE post_id = $1
-RETURNING *;
+WHERE post_id = $1;

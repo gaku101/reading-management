@@ -31,7 +31,10 @@ UPDATE posts
 SET title = $2
 WHERE id = $1
 RETURNING *;
--- name: DeletePost :one
+-- name: DeletePost :exec
 DELETE FROM posts
-WHERE id = $1
-RETURNING *;
+WHERE id = $1;
+-- name: ListMyAllPosts :many
+SELECT *
+FROM posts
+WHERE author = $1;

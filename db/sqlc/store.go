@@ -10,7 +10,8 @@ import (
 type Store interface {
 	Querier
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
-	DeletePostTx(ctx context.Context, arg DeletePostTxParams) (DeletePostTxResult, error)
+	DeletePostTx(ctx context.Context, arg DeletePostTxParams) error
+	DeleteUserTx(ctx context.Context, arg DeleteUserTxParams) error
 }
 
 //SQLStore provides all functions to execute SQL queries and transaction
@@ -134,20 +135,12 @@ type DeletePostTxParams struct {
 	ID int64 `json:"id"`
 }
 
-type DeletePostTxResult struct {
-	Post          Post         `json:"post"`
-	Comments      Comment      `json:"comments"`
-	PostFavorites PostFavorite `json:"post_favorites"`
-	PostCategory  PostCategory `json:"post_category"`
-}
-
-func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams) (DeletePostTxResult, error) {
-	var result DeletePostTxResult
+func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams) error {
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
-		result.Comments, err = q.DeleteComments(ctx, arg.ID)
+		err = q.DeleteComments(ctx, arg.ID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Printf("post_id = %v on Comments not set", arg.ID)
@@ -155,8 +148,15 @@ func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams)
 				return err
 			}
 		}
-	
-		result.PostCategory, err = q.DeletePostCategory(ctx, arg.ID)
+		err = q.DeletePostFavorites(ctx, arg.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v on PostFavorites not set", arg.ID)
+			} else {
+				return err
+			}
+		}
+		err = q.DeletePostCategory(ctx, arg.ID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Printf("post_id = %v on PostCategory not set", arg.ID)
@@ -164,7 +164,15 @@ func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams)
 				return err
 			}
 		}
-		result.Post, err = q.DeletePost(ctx, arg.ID)
+		err = q.DeleteNotes(ctx, arg.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("post_id = %v on PostCategory not set", arg.ID)
+			} else {
+				return err
+			}
+		}
+		err = q.DeletePost(ctx, arg.ID)
 		if err != nil {
 			return err
 		}
@@ -172,5 +180,93 @@ func (store *SQLStore) DeletePostTx(ctx context.Context, arg DeletePostTxParams)
 		return err
 	})
 
-	return result, err
+	return err
+}
+
+type DeleteUserTxParams struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+}
+
+func (store *SQLStore) DeleteUserTx(ctx context.Context, arg DeleteUserTxParams) error {
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		err = q.DeleteFollows(ctx, arg.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("id = %v on follow not set", arg.ID)
+			} else {
+				return err
+			}
+		}
+		posts, err := q.ListMyAllPosts(ctx, arg.Username)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("Username = %v on posts not set", arg.Username)
+			} else {
+				return err
+			}
+		}
+		for i := range posts {
+			post := posts[i]
+			err = q.DeleteComments(ctx, post.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("post_id = %v on Comments not set", post.ID)
+				} else {
+					return err
+				}
+			}
+			err = q.DeletePostFavorites(ctx, post.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("post_id = %v on PostFavorites not set", post.ID)
+				} else {
+					return err
+				}
+			}
+			err = q.DeletePostCategory(ctx, post.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("post_id = %v on PostCategory not set", post.ID)
+				} else {
+					return err
+				}
+			}
+			err = q.DeleteNotes(ctx, post.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("post_id = %v on PostCategory not set", arg.ID)
+				} else {
+					return err
+				}
+			}
+			err = q.DeletePost(ctx, post.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("post_id = %v on Posts not set", post.ID)
+				} else {
+					return err
+				}
+			}
+		}
+		err = q.DeleteMyFavoritePosts(ctx, arg.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					fmt.Printf("id = %v on post_favorites not set", arg.ID)
+				} else {
+					return err
+				}
+			}
+		err = q.DeleteUser(ctx, arg.Username)
+		if err != nil {
+			return err
+		}
+
+		return err
+	})
+
+	return err
 }

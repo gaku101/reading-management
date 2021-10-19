@@ -8,10 +8,9 @@ FROM comments
 WHERE post_id = $1
 ORDER BY id
 LIMIT $2 OFFSET $3;
--- name: DeleteComments :one
+-- name: DeleteComments :exec
 DELETE FROM comments
-WHERE post_id = $1
-RETURNING *;
+WHERE post_id = $1;
 -- name: GetCommentsId :many
 SELECT id
 FROM comments
