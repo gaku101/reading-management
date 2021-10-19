@@ -23,3 +23,6 @@ RETURNING *;
 -- name: DeleteNote :exec
 DELETE FROM notes
 WHERE id = $1;
+-- name: DeleteNotes :exec
+DELETE FROM notes
+WHERE post_id = $1;

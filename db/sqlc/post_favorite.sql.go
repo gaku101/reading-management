@@ -26,6 +26,16 @@ func (q *Queries) CreatePostFavorite(ctx context.Context, arg CreatePostFavorite
 	return i, err
 }
 
+const deleteMyFavoritePosts = `-- name: DeleteMyFavoritePosts :exec
+DELETE FROM post_favorites
+WHERE user_id = $1
+`
+
+func (q *Queries) DeleteMyFavoritePosts(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteMyFavoritePosts, userID)
+	return err
+}
+
 const deletePostFavorite = `-- name: DeletePostFavorite :exec
 DELETE FROM post_favorites
 WHERE post_id = $1
@@ -39,6 +49,16 @@ type DeletePostFavoriteParams struct {
 
 func (q *Queries) DeletePostFavorite(ctx context.Context, arg DeletePostFavoriteParams) error {
 	_, err := q.db.ExecContext(ctx, deletePostFavorite, arg.PostID, arg.UserID)
+	return err
+}
+
+const deletePostFavorites = `-- name: DeletePostFavorites :exec
+DELETE FROM post_favorites
+WHERE post_id = $1
+`
+
+func (q *Queries) DeletePostFavorites(ctx context.Context, postID int64) error {
+	_, err := q.db.ExecContext(ctx, deletePostFavorites, postID)
 	return err
 }
 

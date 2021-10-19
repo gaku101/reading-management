@@ -21,12 +21,16 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, id int64) error
 	DeleteComment(ctx context.Context, id int64) error
-	DeleteComments(ctx context.Context, postID int64) (Comment, error)
+	DeleteComments(ctx context.Context, postID int64) error
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
+	DeleteFollows(ctx context.Context, followingID int64) error
+	DeleteMyFavoritePosts(ctx context.Context, userID int64) error
 	DeleteNote(ctx context.Context, id int64) error
-	DeletePost(ctx context.Context, id int64) (Post, error)
-	DeletePostCategory(ctx context.Context, postID int64) (PostCategory, error)
+	DeleteNotes(ctx context.Context, postID int64) error
+	DeletePost(ctx context.Context, id int64) error
+	DeletePostCategory(ctx context.Context, postID int64) error
 	DeletePostFavorite(ctx context.Context, arg DeletePostFavoriteParams) error
+	DeletePostFavorites(ctx context.Context, postID int64) error
 	DeleteUser(ctx context.Context, username string) error
 	GetAccount(ctx context.Context, id int64) (Account, error)
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
@@ -50,6 +54,7 @@ type Querier interface {
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListFavoritePosts(ctx context.Context, arg ListFavoritePostsParams) ([]ListFavoritePostsRow, error)
 	ListFollow(ctx context.Context, arg ListFollowParams) ([]ListFollowRow, error)
+	ListMyAllPosts(ctx context.Context, author string) ([]Post, error)
 	ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Post, error)
 	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)

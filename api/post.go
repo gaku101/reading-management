@@ -401,11 +401,9 @@ func (server *Server) deletePost(ctx *gin.Context) {
 		ID: req.ID,
 	}
 
-	result, err := server.store.DeletePostTx(ctx, arg)
+	err = server.store.DeletePostTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	ctx.JSON(http.StatusOK, result)
 }

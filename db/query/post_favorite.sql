@@ -28,3 +28,9 @@ WHERE post_id = $1;
 DELETE FROM post_favorites
 WHERE post_id = $1
   AND user_id = $2;
+-- name: DeletePostFavorites :exec
+DELETE FROM post_favorites
+WHERE post_id = $1;
+-- name: DeleteMyFavoritePosts :exec
+DELETE FROM post_favorites
+WHERE user_id = $1;

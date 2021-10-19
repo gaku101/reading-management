@@ -244,12 +244,11 @@ func (mr *MockStoreMockRecorder) DeleteComment(arg0, arg1 interface{}) *gomock.C
 }
 
 // DeleteComments mocks base method.
-func (m *MockStore) DeleteComments(arg0 context.Context, arg1 int64) (db.Comment, error) {
+func (m *MockStore) DeleteComments(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteComments", arg0, arg1)
-	ret0, _ := ret[0].(db.Comment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteComments indicates an expected call of DeleteComments.
@@ -272,6 +271,34 @@ func (mr *MockStoreMockRecorder) DeleteFollow(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFollow", reflect.TypeOf((*MockStore)(nil).DeleteFollow), arg0, arg1)
 }
 
+// DeleteFollows mocks base method.
+func (m *MockStore) DeleteFollows(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFollows", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFollows indicates an expected call of DeleteFollows.
+func (mr *MockStoreMockRecorder) DeleteFollows(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFollows", reflect.TypeOf((*MockStore)(nil).DeleteFollows), arg0, arg1)
+}
+
+// DeleteMyFavoritePosts mocks base method.
+func (m *MockStore) DeleteMyFavoritePosts(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMyFavoritePosts", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMyFavoritePosts indicates an expected call of DeleteMyFavoritePosts.
+func (mr *MockStoreMockRecorder) DeleteMyFavoritePosts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMyFavoritePosts", reflect.TypeOf((*MockStore)(nil).DeleteMyFavoritePosts), arg0, arg1)
+}
+
 // DeleteNote mocks base method.
 func (m *MockStore) DeleteNote(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -286,13 +313,26 @@ func (mr *MockStoreMockRecorder) DeleteNote(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNote", reflect.TypeOf((*MockStore)(nil).DeleteNote), arg0, arg1)
 }
 
+// DeleteNotes mocks base method.
+func (m *MockStore) DeleteNotes(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteNotes", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteNotes indicates an expected call of DeleteNotes.
+func (mr *MockStoreMockRecorder) DeleteNotes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNotes", reflect.TypeOf((*MockStore)(nil).DeleteNotes), arg0, arg1)
+}
+
 // DeletePost mocks base method.
-func (m *MockStore) DeletePost(arg0 context.Context, arg1 int64) (db.Post, error) {
+func (m *MockStore) DeletePost(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeletePost", arg0, arg1)
-	ret0, _ := ret[0].(db.Post)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeletePost indicates an expected call of DeletePost.
@@ -302,12 +342,11 @@ func (mr *MockStoreMockRecorder) DeletePost(arg0, arg1 interface{}) *gomock.Call
 }
 
 // DeletePostCategory mocks base method.
-func (m *MockStore) DeletePostCategory(arg0 context.Context, arg1 int64) (db.PostCategory, error) {
+func (m *MockStore) DeletePostCategory(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeletePostCategory", arg0, arg1)
-	ret0, _ := ret[0].(db.PostCategory)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeletePostCategory indicates an expected call of DeletePostCategory.
@@ -330,13 +369,26 @@ func (mr *MockStoreMockRecorder) DeletePostFavorite(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePostFavorite", reflect.TypeOf((*MockStore)(nil).DeletePostFavorite), arg0, arg1)
 }
 
+// DeletePostFavorites mocks base method.
+func (m *MockStore) DeletePostFavorites(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeletePostFavorites", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeletePostFavorites indicates an expected call of DeletePostFavorites.
+func (mr *MockStoreMockRecorder) DeletePostFavorites(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePostFavorites", reflect.TypeOf((*MockStore)(nil).DeletePostFavorites), arg0, arg1)
+}
+
 // DeletePostTx mocks base method.
-func (m *MockStore) DeletePostTx(arg0 context.Context, arg1 db.DeletePostTxParams) (db.DeletePostTxResult, error) {
+func (m *MockStore) DeletePostTx(arg0 context.Context, arg1 db.DeletePostTxParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeletePostTx", arg0, arg1)
-	ret0, _ := ret[0].(db.DeletePostTxResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeletePostTx indicates an expected call of DeletePostTx.
@@ -357,6 +409,20 @@ func (m *MockStore) DeleteUser(arg0 context.Context, arg1 string) error {
 func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
+}
+
+// DeleteUserTx mocks base method.
+func (m *MockStore) DeleteUserTx(arg0 context.Context, arg1 db.DeleteUserTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserTx indicates an expected call of DeleteUserTx.
+func (mr *MockStoreMockRecorder) DeleteUserTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserTx", reflect.TypeOf((*MockStore)(nil).DeleteUserTx), arg0, arg1)
 }
 
 // GetAccount mocks base method.
@@ -687,6 +753,21 @@ func (m *MockStore) ListFollow(arg0 context.Context, arg1 db.ListFollowParams) (
 func (mr *MockStoreMockRecorder) ListFollow(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFollow", reflect.TypeOf((*MockStore)(nil).ListFollow), arg0, arg1)
+}
+
+// ListMyAllPosts mocks base method.
+func (m *MockStore) ListMyAllPosts(arg0 context.Context, arg1 string) ([]db.Post, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListMyAllPosts", arg0, arg1)
+	ret0, _ := ret[0].([]db.Post)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListMyAllPosts indicates an expected call of ListMyAllPosts.
+func (mr *MockStoreMockRecorder) ListMyAllPosts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMyAllPosts", reflect.TypeOf((*MockStore)(nil).ListMyAllPosts), arg0, arg1)
 }
 
 // ListMyPosts mocks base method.

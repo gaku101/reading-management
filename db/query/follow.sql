@@ -22,3 +22,7 @@ LIMIT $2 OFFSET $3;
 DELETE FROM follow
 WHERE following_id = $1
   AND follower_id = $2;
+-- name: DeleteFollows :exec
+DELETE FROM follow
+WHERE following_id = $1
+  OR follower_id = $1;

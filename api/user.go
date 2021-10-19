@@ -260,15 +260,30 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
-
-	err := server.store.DeleteUser(ctx, req.Username)
+	user, err := server.store.GetUser(ctx, req.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusOK, nil)
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
-
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
+	}
+
+	arg := db.DeleteUserTxParams{
+		ID:       user.ID,
+		Username: req.Username,
+	}
+
+	err = server.store.DeleteUserTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	
+	awsS3 := infrastructure.NewAwsS3()
+	err = awsS3.Delete(user.Image)
+	if err != nil {
+		ctx.JSON(400, gin.H{"message": err.Error()})
 	}
 }
