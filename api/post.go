@@ -266,7 +266,7 @@ func (server *Server) listPosts(ctx *gin.Context) {
 type updatePostRequest struct {
 	ID         int64  `json:"id" binding:"required,min=1"`
 	Author     string `json:"author" binding:"required,alphanum"`
-	Title      string `json:"title"`
+	BookPageRead      int16 `json:"bookPageRead"`
 	CategoryID int64  `json:"categoryId"`
 }
 
@@ -291,7 +291,7 @@ func (server *Server) updatePost(ctx *gin.Context) {
 
 	arg := db.UpdatePostParams{
 		ID:    req.ID,
-		Title: req.Title,
+		BookPageRead: req.BookPageRead,
 	}
 
 	post, err := server.store.UpdatePost(ctx, arg)

@@ -28,7 +28,7 @@ ORDER BY id DESC
 LIMIT $2 OFFSET $3;
 -- name: UpdatePost :one
 UPDATE posts
-SET title = $2
+SET book_page_read = $2
 WHERE id = $1
 RETURNING *;
 -- name: DeletePost :exec

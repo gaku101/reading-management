@@ -222,18 +222,18 @@ func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, e
 
 const updatePost = `-- name: UpdatePost :one
 UPDATE posts
-SET title = $2
+SET book_page_read = $2
 WHERE id = $1
 RETURNING id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
 `
 
 type UpdatePostParams struct {
-	ID    int64  `json:"id"`
-	Title string `json:"title"`
+	ID           int64 `json:"id"`
+	BookPageRead int16 `json:"book_page_read"`
 }
 
 func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error) {
-	row := q.db.QueryRowContext(ctx, updatePost, arg.ID, arg.Title)
+	row := q.db.QueryRowContext(ctx, updatePost, arg.ID, arg.BookPageRead)
 	var i Post
 	err := row.Scan(
 		&i.ID,
