@@ -8,22 +8,22 @@ import (
 )
 
 const createEntry = `-- name: CreateEntry :one
-INSERT INTO entries (account_id, amount)
+INSERT INTO entries (user_id, amount)
 VALUES ($1, $2)
-RETURNING id, account_id, amount, created_at
+RETURNING id, user_id, amount, created_at
 `
 
 type CreateEntryParams struct {
-	AccountID int64 `json:"account_id"`
-	Amount    int64 `json:"amount"`
+	UserID int64 `json:"user_id"`
+	Amount int64 `json:"amount"`
 }
 
 func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error) {
-	row := q.db.QueryRowContext(ctx, createEntry, arg.AccountID, arg.Amount)
+	row := q.db.QueryRowContext(ctx, createEntry, arg.UserID, arg.Amount)
 	var i Entry
 	err := row.Scan(
 		&i.ID,
-		&i.AccountID,
+		&i.UserID,
 		&i.Amount,
 		&i.CreatedAt,
 	)
@@ -31,7 +31,7 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry
 }
 
 const getEntry = `-- name: GetEntry :one
-SELECT id, account_id, amount, created_at
+SELECT id, user_id, amount, created_at
 FROM entries
 WHERE id = $1
 LIMIT 1
@@ -42,7 +42,7 @@ func (q *Queries) GetEntry(ctx context.Context, id int64) (Entry, error) {
 	var i Entry
 	err := row.Scan(
 		&i.ID,
-		&i.AccountID,
+		&i.UserID,
 		&i.Amount,
 		&i.CreatedAt,
 	)
@@ -50,21 +50,21 @@ func (q *Queries) GetEntry(ctx context.Context, id int64) (Entry, error) {
 }
 
 const listEntries = `-- name: ListEntries :many
-SELECT id, account_id, amount, created_at
+SELECT id, user_id, amount, created_at
 FROM entries
-WHERE account_id = $1
+WHERE user_id = $1
 ORDER BY id
 LIMIT $2 OFFSET $3
 `
 
 type ListEntriesParams struct {
-	AccountID int64 `json:"account_id"`
-	Limit     int32 `json:"limit"`
-	Offset    int32 `json:"offset"`
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error) {
-	rows, err := q.db.QueryContext(ctx, listEntries, arg.AccountID, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listEntries, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Ent
 		var i Entry
 		if err := rows.Scan(
 			&i.ID,
-			&i.AccountID,
+			&i.UserID,
 			&i.Amount,
 			&i.CreatedAt,
 		); err != nil {

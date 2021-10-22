@@ -11,9 +11,9 @@ import (
 )
 
 type transferRequest struct {
-	FromAccountID int64 `json:"from_account_id" binding:"required,min=1"`
-	ToAccountID   int64 `json:"to_account_id" binding:"required,min=1"`
-	Amount        int64 `json:"amount" binding:"required,gt=0"`
+	FromUserID int64 `json:"fromUserId" binding:"required,min=1"`
+	ToUserID   int64 `json:"toUserId" binding:"required,min=1"`
+	Amount     int64 `json:"amount" binding:"required,gt=0"`
 }
 
 func (server *Server) createTransfer(ctx *gin.Context) {
@@ -23,26 +23,31 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 		return
 	}
 
-	fromAccount, valid := server.validAccount(ctx, req.FromAccountID)
-	if !valid {
-		return
+	fromUser, err := server.store.GetUserById(ctx, req.FromUserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
-
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	if fromAccount.Owner != authPayload.Username {
-		err := errors.New("from account doesn't belong to the authenticated user")
+	if fromUser.Username != authPayload.Username {
+		err := errors.New("from user id doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
-	_, valid = server.validAccount(ctx, req.ToAccountID)
-	if !valid {
-		return
+	_, err = server.store.GetUserById(ctx, req.ToUserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
 	arg := db.TransferTxParams{
-		FromAccountID: req.FromAccountID,
-		ToAccountID:   req.ToAccountID,
-		Amount:        req.Amount,
+		FromUserID: req.FromUserID,
+		ToUserID:   req.ToUserID,
+		Amount:     req.Amount,
 	}
 
 	result, err := server.store.TransferTx(ctx, arg)
@@ -52,19 +57,4 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, result)
-}
-
-func (server *Server) validAccount(ctx *gin.Context, accountID int64) (db.Account, bool) {
-	account, err := server.store.GetAccount(ctx, accountID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return account, false
-		}
-
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return account, false
-	}
-
-	return account, true
 }

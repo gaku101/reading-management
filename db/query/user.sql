@@ -1,6 +1,13 @@
 -- name: CreateUser :one
-INSERT INTO users (username, hashed_password, email, profile, image)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO users (
+    username,
+    hashed_password,
+    email,
+    profile,
+    image,
+    points
+  )
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 -- name: GetUser :one
 SELECT *
@@ -30,3 +37,10 @@ LIMIT 1;
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE username = $1;
+-- name: UpdatePoints :one
+UPDATE users
+SET points = points + sqlc.arg(amount)
+WHERE id = sqlc.arg(id)
+RETURNING id,
+  username,
+  points;

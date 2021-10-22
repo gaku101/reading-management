@@ -17,7 +17,7 @@ INSERT INTO posts (
     book_page_read
   )
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+RETURNING id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 `
 
 type CreatePostParams struct {
@@ -43,12 +43,12 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.ID,
 		&i.Author,
 		&i.Title,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 		&i.BookAuthor,
 		&i.BookImage,
 		&i.BookPage,
 		&i.BookPageRead,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -64,7 +64,7 @@ func (q *Queries) DeletePost(ctx context.Context, id int64) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+SELECT id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 FROM posts
 WHERE id = $1
 LIMIT 1
@@ -77,18 +77,18 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 		&i.ID,
 		&i.Author,
 		&i.Title,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 		&i.BookAuthor,
 		&i.BookImage,
 		&i.BookPage,
 		&i.BookPageRead,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listMyAllPosts = `-- name: ListMyAllPosts :many
-SELECT id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+SELECT id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 FROM posts
 WHERE author = $1
 `
@@ -106,12 +106,12 @@ func (q *Queries) ListMyAllPosts(ctx context.Context, author string) ([]Post, er
 			&i.ID,
 			&i.Author,
 			&i.Title,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.BookAuthor,
 			&i.BookImage,
 			&i.BookPage,
 			&i.BookPageRead,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -127,7 +127,7 @@ func (q *Queries) ListMyAllPosts(ctx context.Context, author string) ([]Post, er
 }
 
 const listMyPosts = `-- name: ListMyPosts :many
-SELECT id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+SELECT id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 FROM posts
 WHERE author = $1
 ORDER BY id
@@ -153,12 +153,12 @@ func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Pos
 			&i.ID,
 			&i.Author,
 			&i.Title,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.BookAuthor,
 			&i.BookImage,
 			&i.BookPage,
 			&i.BookPageRead,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -174,7 +174,7 @@ func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Pos
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+SELECT id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 FROM posts
 WHERE NOT author = $1
 ORDER BY id DESC
@@ -200,12 +200,12 @@ func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, e
 			&i.ID,
 			&i.Author,
 			&i.Title,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.BookAuthor,
 			&i.BookImage,
 			&i.BookPage,
 			&i.BookPageRead,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -224,7 +224,7 @@ const updatePost = `-- name: UpdatePost :one
 UPDATE posts
 SET book_page_read = $2
 WHERE id = $1
-RETURNING id, author, title, created_at, updated_at, book_author, book_image, book_page, book_page_read
+RETURNING id, author, title, book_author, book_image, book_page, book_page_read, created_at, updated_at
 `
 
 type UpdatePostParams struct {
@@ -239,12 +239,12 @@ func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, e
 		&i.ID,
 		&i.Author,
 		&i.Title,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 		&i.BookAuthor,
 		&i.BookImage,
 		&i.BookPage,
 		&i.BookPageRead,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
