@@ -7,8 +7,6 @@ import (
 )
 
 type Querier interface {
-	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
-	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateCategory(ctx context.Context, name string) (Category, error)
 	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
@@ -19,7 +17,6 @@ type Querier interface {
 	CreatePostFavorite(ctx context.Context, arg CreatePostFavoriteParams) (PostFavorite, error)
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	DeleteAccount(ctx context.Context, id int64) error
 	DeleteComment(ctx context.Context, id int64) error
 	DeleteComments(ctx context.Context, postID int64) error
 	DeleteFollow(ctx context.Context, arg DeleteFollowParams) error
@@ -32,9 +29,6 @@ type Querier interface {
 	DeletePostFavorite(ctx context.Context, arg DeletePostFavoriteParams) error
 	DeletePostFavorites(ctx context.Context, postID int64) error
 	DeleteUser(ctx context.Context, username string) error
-	GetAccount(ctx context.Context, id int64) (Account, error)
-	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
-	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
 	GetComment(ctx context.Context, id int64) (Comment, error)
 	GetCommentsId(ctx context.Context, postID int64) ([]int64, error)
@@ -59,8 +53,8 @@ type Querier interface {
 	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
-	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)
+	UpdatePoints(ctx context.Context, arg UpdatePointsParams) (UpdatePointsRow, error)
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdatePostCategory(ctx context.Context, arg UpdatePostCategoryParams) (PostCategory, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)

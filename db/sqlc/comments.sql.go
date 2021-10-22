@@ -10,7 +10,7 @@ import (
 const createComment = `-- name: CreateComment :one
 INSERT INTO comments (author, post_id, body)
 VALUES ($1, $2, $3)
-RETURNING id, post_id, body, created_at, author
+RETURNING id, author, post_id, body, created_at
 `
 
 type CreateCommentParams struct {
@@ -24,10 +24,10 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	var i Comment
 	err := row.Scan(
 		&i.ID,
+		&i.Author,
 		&i.PostID,
 		&i.Body,
 		&i.CreatedAt,
-		&i.Author,
 	)
 	return i, err
 }
@@ -53,7 +53,7 @@ func (q *Queries) DeleteComments(ctx context.Context, postID int64) error {
 }
 
 const getComment = `-- name: GetComment :one
-SELECT id, post_id, body, created_at, author
+SELECT id, author, post_id, body, created_at
 FROM comments
 WHERE id = $1
 `
@@ -63,10 +63,10 @@ func (q *Queries) GetComment(ctx context.Context, id int64) (Comment, error) {
 	var i Comment
 	err := row.Scan(
 		&i.ID,
+		&i.Author,
 		&i.PostID,
 		&i.Body,
 		&i.CreatedAt,
-		&i.Author,
 	)
 	return i, err
 }
@@ -101,7 +101,7 @@ func (q *Queries) GetCommentsId(ctx context.Context, postID int64) ([]int64, err
 }
 
 const listComments = `-- name: ListComments :many
-SELECT id, post_id, body, created_at, author
+SELECT id, author, post_id, body, created_at
 FROM comments
 WHERE post_id = $1
 ORDER BY id
@@ -125,10 +125,10 @@ func (q *Queries) ListComments(ctx context.Context, arg ListCommentsParams) ([]C
 		var i Comment
 		if err := rows.Scan(
 			&i.ID,
+			&i.Author,
 			&i.PostID,
 			&i.Body,
 			&i.CreatedAt,
-			&i.Author,
 		); err != nil {
 			return nil, err
 		}

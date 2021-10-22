@@ -24,6 +24,7 @@ type createUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Profile  string `json:"profile"`
 	Image    string `json:"image"`
+	Points   int64  `json:"points"`
 }
 
 type userResponse struct {
@@ -32,6 +33,7 @@ type userResponse struct {
 	Email             string    `json:"email"`
 	Profile           string    `json:"profile"`
 	Image             string    `json:"image"`
+	Points            int64     `json:"points"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 }
@@ -43,6 +45,7 @@ func newUserResponse(user db.User) userResponse {
 		Email:             user.Email,
 		Profile:           user.Profile,
 		Image:             getPresignedUrl(user.Image),
+		Points:            user.Points,
 		PasswordChangedAt: user.PasswordChangedAt,
 		CreatedAt:         user.CreatedAt,
 	}
@@ -67,6 +70,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		Email:          req.Email,
 		Profile:        req.Profile,
 		Image:          req.Image,
+		Points:         req.Points,
 	}
 
 	user, err := server.store.CreateUser(ctx, arg)
@@ -280,7 +284,7 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	
+
 	awsS3 := infrastructure.NewAwsS3()
 	err = awsS3.Delete(user.Image)
 	if err != nil {

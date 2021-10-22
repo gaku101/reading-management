@@ -6,13 +6,6 @@ import (
 	"time"
 )
 
-type Account struct {
-	ID        int64     `json:"id"`
-	Owner     string    `json:"owner"`
-	Balance   int64     `json:"balance"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
 type Category struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -20,16 +13,15 @@ type Category struct {
 
 type Comment struct {
 	ID        int64     `json:"id"`
+	Author    string    `json:"author"`
 	PostID    int64     `json:"post_id"`
 	Body      string    `json:"body"`
 	CreatedAt time.Time `json:"created_at"`
-	Author    string    `json:"author"`
 }
 
 type Entry struct {
-	ID        int64 `json:"id"`
-	AccountID int64 `json:"account_id"`
-	// can be positive or negative
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
 	Amount    int64     `json:"amount"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -54,12 +46,12 @@ type Post struct {
 	ID           int64     `json:"id"`
 	Author       string    `json:"author"`
 	Title        string    `json:"title"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
 	BookAuthor   string    `json:"book_author"`
 	BookImage    string    `json:"book_image"`
 	BookPage     int16     `json:"book_page"`
 	BookPageRead int16     `json:"book_page_read"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type PostCategory struct {
@@ -75,12 +67,11 @@ type PostFavorite struct {
 }
 
 type Transfer struct {
-	ID            int64 `json:"id"`
-	FromAccountID int64 `json:"from_account_id"`
-	ToAccountID   int64 `json:"to_account_id"`
-	// must be positive
-	Amount    int64     `json:"amount"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int64     `json:"id"`
+	FromUserID int64     `json:"from_user_id"`
+	ToUserID   int64     `json:"to_user_id"`
+	Amount     int64     `json:"amount"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type User struct {
@@ -90,6 +81,7 @@ type User struct {
 	Email             string    `json:"email"`
 	Profile           string    `json:"profile"`
 	Image             string    `json:"image"`
+	Points            int64     `json:"points"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 }
