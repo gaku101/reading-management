@@ -131,7 +131,27 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
+	t := time.Now()
+	lastLoginedAt := user.LastLoginedAt
+	if lastLoginedAt.Year() < t.Year() || lastLoginedAt.Month() < t.Month() || lastLoginedAt.Day() < t.Day() {
+		arg := db.LoginPointTxParams{
+			UserID: user.ID,
+			Amount: 1,
+		}
+		_, err := server.store.LoginPointTx(ctx, arg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+	}
+	user, err = server.store.UpdateLoginTime(ctx, db.UpdateLoginTimeParams{
+		ID:            user.ID,
+		LastLoginedAt: time.Now(),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 	rsp := loginUserResponse{
 		AccessToken: accessToken,
 		User:        newUserResponse(user),

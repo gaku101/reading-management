@@ -741,6 +741,21 @@ func (mr *MockStoreMockRecorder) ListTransfers(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTransfers", reflect.TypeOf((*MockStore)(nil).ListTransfers), arg0, arg1)
 }
 
+// LoginPointTx mocks base method.
+func (m *MockStore) LoginPointTx(arg0 context.Context, arg1 db.LoginPointTxParams) (db.LoginPointTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginPointTx", arg0, arg1)
+	ret0, _ := ret[0].(db.LoginPointTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoginPointTx indicates an expected call of LoginPointTx.
+func (mr *MockStoreMockRecorder) LoginPointTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginPointTx", reflect.TypeOf((*MockStore)(nil).LoginPointTx), arg0, arg1)
+}
+
 // TransferTx mocks base method.
 func (m *MockStore) TransferTx(arg0 context.Context, arg1 db.TransferTxParams) (db.TransferTxResult, error) {
 	m.ctrl.T.Helper()
@@ -754,6 +769,21 @@ func (m *MockStore) TransferTx(arg0 context.Context, arg1 db.TransferTxParams) (
 func (mr *MockStoreMockRecorder) TransferTx(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransferTx", reflect.TypeOf((*MockStore)(nil).TransferTx), arg0, arg1)
+}
+
+// UpdateLoginTime mocks base method.
+func (m *MockStore) UpdateLoginTime(arg0 context.Context, arg1 db.UpdateLoginTimeParams) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLoginTime", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateLoginTime indicates an expected call of UpdateLoginTime.
+func (mr *MockStoreMockRecorder) UpdateLoginTime(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLoginTime", reflect.TypeOf((*MockStore)(nil).UpdateLoginTime), arg0, arg1)
 }
 
 // UpdateNote mocks base method.

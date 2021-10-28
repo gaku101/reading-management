@@ -53,6 +53,7 @@ type Querier interface {
 	ListNotes(ctx context.Context, arg ListNotesParams) ([]Note, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
+	UpdateLoginTime(ctx context.Context, arg UpdateLoginTimeParams) (User, error)
 	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)
 	UpdatePoints(ctx context.Context, arg UpdatePointsParams) (UpdatePointsRow, error)
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)

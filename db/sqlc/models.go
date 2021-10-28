@@ -84,4 +84,5 @@ type User struct {
 	Points            int64     `json:"points"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
+	LastLoginedAt     time.Time `json:"last_logined_at"`
 }

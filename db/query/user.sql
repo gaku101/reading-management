@@ -44,3 +44,8 @@ WHERE id = sqlc.arg(id)
 RETURNING id,
   username,
   points;
+-- name: UpdateLoginTime :one
+UPDATE users
+SET last_logined_at = $2
+WHERE id = $1
+RETURNING *;

@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -17,7 +18,7 @@ INSERT INTO users (
     points
   )
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at
+RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
 `
 
 type CreateUserParams struct {
@@ -49,6 +50,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Points,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
+		&i.LastLoginedAt,
 	)
 	return i, err
 }
@@ -64,7 +66,7 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, hashed_password, email, profile, image, points, password_changed_at, created_at
+SELECT id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
 FROM users
 WHERE username = $1
 LIMIT 1
@@ -83,12 +85,13 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Points,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
+		&i.LastLoginedAt,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, hashed_password, email, profile, image, points, password_changed_at, created_at
+SELECT id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
 FROM users
 WHERE id = $1
 LIMIT 1
@@ -107,6 +110,7 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 		&i.Points,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
+		&i.LastLoginedAt,
 	)
 	return i, err
 }
@@ -123,6 +127,36 @@ func (q *Queries) GetUserImage(ctx context.Context, username string) (string, er
 	var image string
 	err := row.Scan(&image)
 	return image, err
+}
+
+const updateLoginTime = `-- name: UpdateLoginTime :one
+UPDATE users
+SET last_logined_at = $2
+WHERE id = $1
+RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
+`
+
+type UpdateLoginTimeParams struct {
+	ID            int64     `json:"id"`
+	LastLoginedAt time.Time `json:"last_logined_at"`
+}
+
+func (q *Queries) UpdateLoginTime(ctx context.Context, arg UpdateLoginTimeParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateLoginTime, arg.ID, arg.LastLoginedAt)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Email,
+		&i.Profile,
+		&i.Image,
+		&i.Points,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+		&i.LastLoginedAt,
+	)
+	return i, err
 }
 
 const updatePoints = `-- name: UpdatePoints :one
@@ -156,7 +190,7 @@ const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET profile = $2
 WHERE id = $1
-RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at
+RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
 `
 
 type UpdateUserParams struct {
@@ -177,6 +211,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Points,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
+		&i.LastLoginedAt,
 	)
 	return i, err
 }
@@ -185,7 +220,7 @@ const updateUserImage = `-- name: UpdateUserImage :one
 UPDATE users
 SET image = $2
 WHERE username = $1
-RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at
+RETURNING id, username, hashed_password, email, profile, image, points, password_changed_at, created_at, last_logined_at
 `
 
 type UpdateUserImageParams struct {
@@ -206,6 +241,7 @@ func (q *Queries) UpdateUserImage(ctx context.Context, arg UpdateUserImageParams
 		&i.Points,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
+		&i.LastLoginedAt,
 	)
 	return i, err
 }
