@@ -12,6 +12,7 @@ type Store interface {
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
 	DeletePostTx(ctx context.Context, arg DeletePostTxParams) error
 	DeleteUserTx(ctx context.Context, arg DeleteUserTxParams) error
+	LoginPointTx(ctx context.Context, arg LoginPointTxParams) (LoginPointTxResult, error)
 }
 
 //SQLStore provides all functions to execute SQL queries and transaction
@@ -129,6 +130,40 @@ func addPoints(
 		Amount: amount2,
 	})
 	return
+}
+
+type LoginPointTxParams struct {
+	UserID int64 `json:"user_id"`
+	Amount int64 `json:"amount"`
+}
+
+type LoginPointTxResult struct {
+	User  UpdatePointsRow `json:"to_user"`
+	Entry Entry           `json:"to_entry"`
+}
+
+func (store *SQLStore) LoginPointTx(ctx context.Context, arg LoginPointTxParams) (LoginPointTxResult, error) {
+	var result LoginPointTxResult
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.Entry, err = q.CreateEntry(ctx, CreateEntryParams{
+			UserID: arg.UserID,
+			Amount: arg.Amount,
+		})
+		if err != nil {
+			return err
+		}
+		result.User, err = q.UpdatePoints(ctx, UpdatePointsParams{
+			ID:     arg.UserID,
+			Amount: arg.Amount,
+		})
+
+		return err
+	})
+
+	return result, err
 }
 
 type DeletePostTxParams struct {
