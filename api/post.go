@@ -50,7 +50,6 @@ func newPostResponse(post db.Post, category db.Category, authorImage string, fav
 type createPostRequest struct {
 	Author     string `json:"author" binding:"required,alphanum"`
 	Title      string `json:"title" binding:"required"`
-	CategoryID int64  `json:"categoryId"`
 	BookAuthor string `json:"bookAuthor"`
 	BookImage  string `json:"bookImage" `
 	BookPage   int16  `json:"bookPage" `
@@ -74,56 +73,23 @@ func (server *Server) createPost(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreatePostParams{
-		Author:       req.Author,
-		Title:        req.Title,
-		BookAuthor:   req.BookAuthor,
-		BookImage:    req.BookImage,
-		BookPage:     req.BookPage,
-		BookPageRead: 0,
+	arg := db.CreatePostTxParams{
+		UserID:     user.ID,
+		Author:     req.Author,
+		Title:      req.Title,
+		BookAuthor: req.BookAuthor,
+		BookImage:  req.BookImage,
+		BookPage:   req.BookPage,
+		Amount:     3,
 	}
 
-	post, err := server.store.CreatePost(ctx, arg)
+	result, err := server.store.CreatePostTx(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "foreign_key_violation", "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
-				return
-			}
-		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	category, err := server.store.GetCategory(ctx, req.CategoryID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			fmt.Printf("post_id = %v's category not set", post.ID)
-		} else {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	}
-	arg2 := db.CreatePostCategoryParams{
-		PostID:     post.ID,
-		CategoryID: category.ID,
-	}
-	if category.ID != 0 {
-		server.store.CreatePostCategory(ctx, arg2)
-		if err != nil {
-			if pqErr, ok := err.(*pq.Error); ok {
-				switch pqErr.Code.Name() {
-				case "foreign_key_violation", "unique_violation":
-					ctx.JSON(http.StatusForbidden, errorResponse(err))
-					return
-				}
-			}
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	}
 
-	rsp := newPostResponse(post, category, "", 0, 0)
+	rsp := newPostResponse(result.Post, db.Category{ID: 0, Name: ""}, "", 0, 0)
 
 	ctx.JSON(http.StatusOK, rsp)
 }
@@ -264,10 +230,10 @@ func (server *Server) listPosts(ctx *gin.Context) {
 }
 
 type updatePostRequest struct {
-	ID         int64  `json:"id" binding:"required,min=1"`
-	Author     string `json:"author" binding:"required,alphanum"`
-	BookPageRead      int16 `json:"bookPageRead"`
-	CategoryID int64  `json:"categoryId"`
+	ID           int64  `json:"id" binding:"required,min=1"`
+	Author       string `json:"author" binding:"required,alphanum"`
+	BookPageRead int16  `json:"bookPageRead"`
+	CategoryID   int64  `json:"categoryId"`
 }
 
 func (server *Server) updatePost(ctx *gin.Context) {
@@ -290,7 +256,7 @@ func (server *Server) updatePost(ctx *gin.Context) {
 	}
 
 	arg := db.UpdatePostParams{
-		ID:    req.ID,
+		ID:           req.ID,
 		BookPageRead: req.BookPageRead,
 	}
 

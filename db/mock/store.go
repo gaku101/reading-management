@@ -155,6 +155,21 @@ func (mr *MockStoreMockRecorder) CreatePostFavorite(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePostFavorite", reflect.TypeOf((*MockStore)(nil).CreatePostFavorite), arg0, arg1)
 }
 
+// CreatePostTx mocks base method.
+func (m *MockStore) CreatePostTx(arg0 context.Context, arg1 db.CreatePostTxParams) (db.CreatePostTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePostTx", arg0, arg1)
+	ret0, _ := ret[0].(db.CreatePostTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePostTx indicates an expected call of CreatePostTx.
+func (mr *MockStoreMockRecorder) CreatePostTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePostTx", reflect.TypeOf((*MockStore)(nil).CreatePostTx), arg0, arg1)
+}
+
 // CreateTransfer mocks base method.
 func (m *MockStore) CreateTransfer(arg0 context.Context, arg1 db.CreateTransferParams) (db.Transfer, error) {
 	m.ctrl.T.Helper()

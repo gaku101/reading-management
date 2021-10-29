@@ -13,6 +13,7 @@ type Store interface {
 	DeletePostTx(ctx context.Context, arg DeletePostTxParams) error
 	DeleteUserTx(ctx context.Context, arg DeleteUserTxParams) error
 	LoginPointTx(ctx context.Context, arg LoginPointTxParams) (LoginPointTxResult, error)
+	CreatePostTx(ctx context.Context, arg CreatePostTxParams) (CreatePostTxResult, error)
 }
 
 //SQLStore provides all functions to execute SQL queries and transaction
@@ -157,7 +158,7 @@ func (store *SQLStore) LoginPointTx(ctx context.Context, arg LoginPointTxParams)
 		}
 		result.User, err = q.UpdatePoints(ctx, UpdatePointsParams{
 			ID:     arg.UserID,
-			Amount: arg.Amount,
+			Amount: result.Entry.Amount,
 		})
 
 		return err
@@ -304,4 +305,58 @@ func (store *SQLStore) DeleteUserTx(ctx context.Context, arg DeleteUserTxParams)
 	})
 
 	return err
+}
+
+type CreatePostTxParams struct {
+	UserID     int64  `json:"userId"`
+	Author     string `json:"author"`
+	Title      string `json:"title"`
+	BookAuthor string `json:"bookAuthor"`
+	BookImage  string `json:"bookImage"`
+	BookPage   int16  `json:"bookPage"`
+	Amount     int64  `json:"amount"`
+}
+
+type CreatePostTxResult struct {
+	Post         Post            `json:"post"`
+	Entry        Entry           `json:"entry"`
+	User         UpdatePointsRow `json:"user"`
+}
+
+func (store *SQLStore) CreatePostTx(ctx context.Context, arg CreatePostTxParams) (CreatePostTxResult, error) {
+	var result CreatePostTxResult
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.Post, err = q.CreatePost(ctx, CreatePostParams{
+			Author:       arg.Author,
+			Title:        arg.Title,
+			BookAuthor:   arg.BookAuthor,
+			BookImage:    arg.BookImage,
+			BookPage:     arg.BookPage,
+			BookPageRead: 0,
+		})
+		if err != nil {
+			return err
+		}
+		result.Entry, err = q.CreateEntry(ctx, CreateEntryParams{
+			UserID: arg.UserID,
+			Amount: arg.Amount,
+		})
+		if err != nil {
+			return err
+		}
+		result.User, err = q.UpdatePoints(ctx, UpdatePointsParams{
+			ID:     arg.UserID,
+			Amount: result.Entry.Amount,
+		})
+		if err != nil {
+			return err
+		}
+
+		return err
+	})
+
+	return result, err
 }
