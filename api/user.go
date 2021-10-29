@@ -98,6 +98,7 @@ type loginUserRequest struct {
 type loginUserResponse struct {
 	AccessToken string       `json:"access_token"`
 	User        userResponse `json:"user"`
+	Entry       db.Entry     `json:"entry"`
 }
 
 func (server *Server) loginUser(ctx *gin.Context) {
@@ -133,12 +134,13 @@ func (server *Server) loginUser(ctx *gin.Context) {
 	}
 	t := time.Now()
 	lastLoginedAt := user.LastLoginedAt
+	var result db.LoginPointTxResult
 	if lastLoginedAt.Year() < t.Year() || lastLoginedAt.Month() < t.Month() || lastLoginedAt.Day() < t.Day() {
 		arg := db.LoginPointTxParams{
 			UserID: user.ID,
 			Amount: 1,
 		}
-		_, err := server.store.LoginPointTx(ctx, arg)
+		result, err = server.store.LoginPointTx(ctx, arg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -155,6 +157,7 @@ func (server *Server) loginUser(ctx *gin.Context) {
 	rsp := loginUserResponse{
 		AccessToken: accessToken,
 		User:        newUserResponse(user),
+		Entry:       result.Entry,
 	}
 	ctx.JSON(http.StatusOK, rsp)
 }
