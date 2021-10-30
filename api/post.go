@@ -29,7 +29,7 @@ type postResponse struct {
 	CommentsNum  int         `json:"commentsNum"`
 }
 
-func newPostResponse(post db.Post, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
+func newPostRelatedResponse(post db.Post, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
 	return postResponse{
 		Id:           post.ID,
 		Author:       post.Author,
@@ -40,10 +40,21 @@ func newPostResponse(post db.Post, category db.Category, authorImage string, fav
 		BookPage:     post.BookPage,
 		BookPageRead: post.BookPageRead,
 		CreatedAt:    post.CreatedAt,
-		UpdatedAt:    post.UpdatedAt,
 		AuthorImage:  authorImage,
 		Favorites:    favorites,
 		CommentsNum:  commentsNum,
+	}
+}
+func newPostResponse(post db.Post) postResponse {
+	return postResponse{
+		Id:           post.ID,
+		Author:       post.Author,
+		Title:        post.Title,
+		BookAuthor:   post.BookAuthor,
+		BookImage:    post.BookImage,
+		BookPage:     post.BookPage,
+		BookPageRead: post.BookPageRead,
+		CreatedAt:    post.CreatedAt,
 	}
 }
 
@@ -85,17 +96,29 @@ func (server *Server) createPost(ctx *gin.Context) {
 
 	result, err := server.store.CreatePostTx(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	rsp := newPostResponse(result.Post, db.Category{ID: 0, Name: ""}, "", 0, 0)
+	rsp := newPostResponse(result.Post)
 
 	ctx.JSON(http.StatusOK, rsp)
 }
 
 type getPostRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
+}
+type getPostResponse struct {
+	Post         postResponse `json:"post"`
+	PostFavorite int          `json:"postFavorite"`
+	Category     db.Category  `json:"category"`
 }
 
 func (server *Server) getPost(ctx *gin.Context) {
@@ -125,7 +148,11 @@ func (server *Server) getPost(ctx *gin.Context) {
 		}
 	}
 	postFavorite := len(server.getFavoriteCount(ctx, post.ID))
-	rsp := newPostResponse(post, category, "", postFavorite, 0)
+	rsp := getPostResponse{
+		Post:         newPostResponse(post),
+		PostFavorite: postFavorite,
+		Category:     category,
+	}
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -169,7 +196,7 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 		postFavorite := len(server.getFavoriteCount(ctx, post.ID))
 		commentsNum := server.getCommentsCount(ctx, post.ID)
 
-		rsp := newPostResponse(post, category, "", postFavorite, commentsNum)
+		rsp := newPostRelatedResponse(post, category, "", postFavorite, commentsNum)
 		response = append(response, rsp)
 	}
 
@@ -222,7 +249,7 @@ func (server *Server) listPosts(ctx *gin.Context) {
 		favorites := len(server.getFavoriteCount(ctx, post.ID))
 		commentsNum := server.getCommentsCount(ctx, post.ID)
 
-		rsp := newPostResponse(post, category, preUrl, favorites, commentsNum)
+		rsp := newPostRelatedResponse(post, category, preUrl, favorites, commentsNum)
 		response = append(response, rsp)
 	}
 
@@ -233,7 +260,6 @@ type updatePostRequest struct {
 	ID           int64  `json:"id" binding:"required,min=1"`
 	Author       string `json:"author" binding:"required,alphanum"`
 	BookPageRead int16  `json:"bookPageRead"`
-	CategoryID   int64  `json:"categoryId"`
 }
 
 func (server *Server) updatePost(ctx *gin.Context) {
@@ -265,48 +291,7 @@ func (server *Server) updatePost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	category, err := server.store.GetCategory(ctx, req.CategoryID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			fmt.Printf("post_id = %v's category not set", post.ID)
-		} else {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	}
-	arg2 := db.UpdatePostCategoryParams{
-		PostID:     post.ID,
-		CategoryID: category.ID,
-	}
-	arg3 := db.CreatePostCategoryParams{
-		PostID:     post.ID,
-		CategoryID: category.ID,
-	}
-	if req.CategoryID != 0 {
-		_, err = server.store.UpdatePostCategory(ctx, arg2)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				_, err = server.store.CreatePostCategory(ctx, arg3)
-				if err != nil {
-					if pqErr, ok := err.(*pq.Error); ok {
-						switch pqErr.Code.Name() {
-						case "foreign_key_violation", "unique_violation":
-							ctx.JSON(http.StatusForbidden, errorResponse(err))
-							return
-						}
-					} else {
-						ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-						return
-					}
-				}
-			} else {
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-		}
-	}
-	favorites := len(server.getFavoriteCount(ctx, post.ID))
-	rsp := newPostResponse(post, category, "", favorites, 0)
+	rsp := newPostResponse(post)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
