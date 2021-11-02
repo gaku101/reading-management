@@ -66,6 +66,11 @@ type createPostRequest struct {
 	BookPage   int16  `json:"bookPage" `
 }
 
+type createPostResponse struct {
+	Post  postResponse `json:"post"`
+	Entry db.Entry     `json:"entry"`
+}
+
 func (server *Server) createPost(ctx *gin.Context) {
 	var req createPostRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -106,8 +111,10 @@ func (server *Server) createPost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	rsp := newPostResponse(result.Post)
+	rsp := createPostResponse{
+		Post:  newPostResponse(result.Post),
+		Entry: result.Entry,
+	}
 
 	ctx.JSON(http.StatusOK, rsp)
 }
