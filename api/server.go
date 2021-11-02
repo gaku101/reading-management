@@ -62,6 +62,8 @@ func (server *Server) setupRouter() {
 	authRoutes.POST("/category", server.createCategory)
 	authRoutes.GET("/category", server.listCategories)
 
+	authRoutes.PUT("/post-category", server.updatePostCategory)
+
 	authRoutes.GET("/post-favorite/list/:userId", server.listFavoritePosts)
 	authRoutes.GET("/post-favorite/:postId", server.getPostFavorite)
 	authRoutes.POST("/post-favorite", server.createPostFavorite)
