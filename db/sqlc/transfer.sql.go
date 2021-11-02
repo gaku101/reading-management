@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createTransfer = `-- name: CreateTransfer :one
@@ -53,41 +54,50 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 }
 
 const listTransfers = `-- name: ListTransfers :many
-SELECT id, from_user_id, to_user_id, amount, created_at
+SELECT transfers.id,
+  from_user_id,
+  to_user_id,
+  amount,
+  transfers.created_at,
+  users.username
 FROM transfers
-WHERE from_user_id = $1
-  OR to_user_id = $2
-ORDER BY id
-LIMIT $3 OFFSET $4
+  JOIN users ON from_user_id = users.id
+  AND to_user_id = $1
+ORDER BY id DESC
+LIMIT $2 OFFSET $3
 `
 
 type ListTransfersParams struct {
-	FromUserID int64 `json:"from_user_id"`
-	ToUserID   int64 `json:"to_user_id"`
-	Limit      int32 `json:"limit"`
-	Offset     int32 `json:"offset"`
+	ToUserID int64 `json:"to_user_id"`
+	Limit    int32 `json:"limit"`
+	Offset   int32 `json:"offset"`
 }
 
-func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, listTransfers,
-		arg.FromUserID,
-		arg.ToUserID,
-		arg.Limit,
-		arg.Offset,
-	)
+type ListTransfersRow struct {
+	ID         int64     `json:"id"`
+	FromUserID int64     `json:"from_user_id"`
+	ToUserID   int64     `json:"to_user_id"`
+	Amount     int64     `json:"amount"`
+	CreatedAt  time.Time `json:"created_at"`
+	Username   string    `json:"username"`
+}
+
+func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]ListTransfersRow, error) {
+	rows, err := q.db.QueryContext(ctx, listTransfers, arg.ToUserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Transfer{}
+	items := []ListTransfersRow{}
 	for rows.Next() {
-		var i Transfer
+		var i ListTransfersRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.FromUserID,
 			&i.ToUserID,
 			&i.Amount,
 			&i.CreatedAt,
+			&i.Username,
 		); err != nil {
 			return nil, err
 		}
