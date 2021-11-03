@@ -7,7 +7,8 @@ CREATE TABLE "users" (
   "image" varchar NOT NULL,
   "points" bigint NOT NULL,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "last_logined_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "posts" (
@@ -78,6 +79,17 @@ CREATE TABLE "transfers" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "user_badge" (
+  "id" bigserial PRIMARY KEY,
+  "user_id" bigint NOT NULL,
+  "badge_id" bigint NOT NULL
+);
+
+CREATE TABLE "badge" (
+  "id" bigserial PRIMARY KEY,
+  "name" varchar NOT NULL
+);
+
 ALTER TABLE "posts" ADD FOREIGN KEY ("author") REFERENCES "users" ("username");
 
 ALTER TABLE "notes" ADD FOREIGN KEY ("author") REFERENCES "users" ("username");
@@ -105,6 +117,10 @@ ALTER TABLE "entries" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "transfers" ADD FOREIGN KEY ("from_user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "transfers" ADD FOREIGN KEY ("to_user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "user_badge" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "user_badge" ADD FOREIGN KEY ("badge_id") REFERENCES "badge" ("id");
 
 CREATE INDEX ON "users" ("username");
 

@@ -64,7 +64,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateUserParams{
+	arg := db.CreateUserTxParams{
 		Username:       req.Username,
 		HashedPassword: hashedPassword,
 		Email:          req.Email,
@@ -73,7 +73,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		Points:         req.Points,
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	result, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
@@ -86,7 +86,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := newUserResponse(user)
+	rsp := newUserResponse(result.User)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
