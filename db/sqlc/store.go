@@ -14,6 +14,7 @@ type Store interface {
 	DeleteUserTx(ctx context.Context, arg DeleteUserTxParams) error
 	LoginPointTx(ctx context.Context, arg LoginPointTxParams) (LoginPointTxResult, error)
 	CreatePostTx(ctx context.Context, arg CreatePostTxParams) (CreatePostTxResult, error)
+	CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error)
 }
 
 //SQLStore provides all functions to execute SQL queries and transaction
@@ -296,6 +297,14 @@ func (store *SQLStore) DeleteUserTx(ctx context.Context, arg DeleteUserTxParams)
 				return err
 			}
 		}
+		err = q.DeleteUserBadge(ctx, arg.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Printf("id = %v on post_favorites not set", arg.ID)
+			} else {
+				return err
+			}
+		}
 		err = q.DeleteUser(ctx, arg.Username)
 		if err != nil {
 			return err
@@ -318,9 +327,9 @@ type CreatePostTxParams struct {
 }
 
 type CreatePostTxResult struct {
-	Post         Post            `json:"post"`
-	Entry        Entry           `json:"entry"`
-	User         UpdatePointsRow `json:"user"`
+	Post  Post            `json:"post"`
+	Entry Entry           `json:"entry"`
+	User  UpdatePointsRow `json:"user"`
 }
 
 func (store *SQLStore) CreatePostTx(ctx context.Context, arg CreatePostTxParams) (CreatePostTxResult, error) {
@@ -350,6 +359,51 @@ func (store *SQLStore) CreatePostTx(ctx context.Context, arg CreatePostTxParams)
 		result.User, err = q.UpdatePoints(ctx, UpdatePointsParams{
 			ID:     arg.UserID,
 			Amount: result.Entry.Amount,
+		})
+		if err != nil {
+			return err
+		}
+
+		return err
+	})
+
+	return result, err
+}
+
+type CreateUserTxParams struct {
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	Email          string `json:"email"`
+	Profile        string `json:"profile"`
+	Image          string `json:"image"`
+	Points         int64  `json:"points"`
+}
+
+type CreateUserTxResult struct {
+	User      User `json:"user"`
+	UserBadge UserBadge       `json:"user_badge"`
+}
+
+func (store *SQLStore) CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error) {
+	var result CreateUserTxResult
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.User, err = q.CreateUser(ctx, CreateUserParams{
+			Username:       arg.Username,
+			HashedPassword: arg.HashedPassword,
+			Email:          arg.Email,
+			Profile:        arg.Profile,
+			Image:          arg.Image,
+			Points:         arg.Points,
+		})
+		if err != nil {
+			return err
+		}
+		result.UserBadge, err = q.CreateUserBadge(ctx, CreateUserBadgeParams{
+			UserID:  result.User.ID,
+			BadgeID: 1,
 		})
 		if err != nil {
 			return err

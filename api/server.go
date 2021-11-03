@@ -86,6 +86,9 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/notes", server.updateNote)
 	authRoutes.DELETE("/notes/:id", server.deleteNote)
 
+	authRoutes.POST("/badge", server.createBadge)
+
+
 	server.router = router
 }
 

@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS post_category;
+DROP TABLE IF EXISTS user_badge;
+DROP TABLE IF EXISTS badge;
 DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS post_favorites;
 DROP TABLE IF EXISTS follow;

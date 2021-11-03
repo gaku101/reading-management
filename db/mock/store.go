@@ -35,6 +35,21 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
+// CreateBadge mocks base method.
+func (m *MockStore) CreateBadge(arg0 context.Context, arg1 string) (db.Badge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateBadge", arg0, arg1)
+	ret0, _ := ret[0].(db.Badge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateBadge indicates an expected call of CreateBadge.
+func (mr *MockStoreMockRecorder) CreateBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBadge", reflect.TypeOf((*MockStore)(nil).CreateBadge), arg0, arg1)
+}
+
 // CreateCategory mocks base method.
 func (m *MockStore) CreateCategory(arg0 context.Context, arg1 string) (db.Category, error) {
 	m.ctrl.T.Helper()
@@ -198,6 +213,36 @@ func (m *MockStore) CreateUser(arg0 context.Context, arg1 db.CreateUserParams) (
 func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
+}
+
+// CreateUserBadge mocks base method.
+func (m *MockStore) CreateUserBadge(arg0 context.Context, arg1 db.CreateUserBadgeParams) (db.UserBadge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserBadge", arg0, arg1)
+	ret0, _ := ret[0].(db.UserBadge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUserBadge indicates an expected call of CreateUserBadge.
+func (mr *MockStoreMockRecorder) CreateUserBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserBadge", reflect.TypeOf((*MockStore)(nil).CreateUserBadge), arg0, arg1)
+}
+
+// CreateUserTx mocks base method.
+func (m *MockStore) CreateUserTx(arg0 context.Context, arg1 db.CreateUserTxParams) (db.CreateUserTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserTx", arg0, arg1)
+	ret0, _ := ret[0].(db.CreateUserTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUserTx indicates an expected call of CreateUserTx.
+func (mr *MockStoreMockRecorder) CreateUserTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserTx", reflect.TypeOf((*MockStore)(nil).CreateUserTx), arg0, arg1)
 }
 
 // DeleteComment mocks base method.
@@ -382,6 +427,20 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
 }
 
+// DeleteUserBadge mocks base method.
+func (m *MockStore) DeleteUserBadge(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserBadge", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserBadge indicates an expected call of DeleteUserBadge.
+func (mr *MockStoreMockRecorder) DeleteUserBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserBadge", reflect.TypeOf((*MockStore)(nil).DeleteUserBadge), arg0, arg1)
+}
+
 // DeleteUserTx mocks base method.
 func (m *MockStore) DeleteUserTx(arg0 context.Context, arg1 db.DeleteUserTxParams) error {
 	m.ctrl.T.Helper()
@@ -394,6 +453,21 @@ func (m *MockStore) DeleteUserTx(arg0 context.Context, arg1 db.DeleteUserTxParam
 func (mr *MockStoreMockRecorder) DeleteUserTx(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserTx", reflect.TypeOf((*MockStore)(nil).DeleteUserTx), arg0, arg1)
+}
+
+// GetBadge mocks base method.
+func (m *MockStore) GetBadge(arg0 context.Context, arg1 int64) (db.Badge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBadge", arg0, arg1)
+	ret0, _ := ret[0].(db.Badge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBadge indicates an expected call of GetBadge.
+func (mr *MockStoreMockRecorder) GetBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBadge", reflect.TypeOf((*MockStore)(nil).GetBadge), arg0, arg1)
 }
 
 // GetCategory mocks base method.
@@ -576,6 +650,21 @@ func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
 }
 
+// GetUserBadge mocks base method.
+func (m *MockStore) GetUserBadge(arg0 context.Context, arg1 int64) (db.Badge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserBadge", arg0, arg1)
+	ret0, _ := ret[0].(db.Badge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserBadge indicates an expected call of GetUserBadge.
+func (mr *MockStoreMockRecorder) GetUserBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBadge", reflect.TypeOf((*MockStore)(nil).GetUserBadge), arg0, arg1)
+}
+
 // GetUserById mocks base method.
 func (m *MockStore) GetUserById(arg0 context.Context, arg1 int64) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -604,6 +693,21 @@ func (m *MockStore) GetUserImage(arg0 context.Context, arg1 string) (string, err
 func (mr *MockStoreMockRecorder) GetUserImage(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserImage", reflect.TypeOf((*MockStore)(nil).GetUserImage), arg0, arg1)
+}
+
+// ListBadges mocks base method.
+func (m *MockStore) ListBadges(arg0 context.Context) ([]db.Badge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListBadges", arg0)
+	ret0, _ := ret[0].([]db.Badge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListBadges indicates an expected call of ListBadges.
+func (mr *MockStoreMockRecorder) ListBadges(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBadges", reflect.TypeOf((*MockStore)(nil).ListBadges), arg0)
 }
 
 // ListCategories mocks base method.
@@ -874,6 +978,21 @@ func (m *MockStore) UpdateUser(arg0 context.Context, arg1 db.UpdateUserParams) (
 func (mr *MockStoreMockRecorder) UpdateUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockStore)(nil).UpdateUser), arg0, arg1)
+}
+
+// UpdateUserBadge mocks base method.
+func (m *MockStore) UpdateUserBadge(arg0 context.Context, arg1 db.UpdateUserBadgeParams) (db.UserBadge, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserBadge", arg0, arg1)
+	ret0, _ := ret[0].(db.UserBadge)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUserBadge indicates an expected call of UpdateUserBadge.
+func (mr *MockStoreMockRecorder) UpdateUserBadge(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserBadge", reflect.TypeOf((*MockStore)(nil).UpdateUserBadge), arg0, arg1)
 }
 
 // UpdateUserImage mocks base method.

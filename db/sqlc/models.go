@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Badge struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type Category struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -85,4 +90,10 @@ type User struct {
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 	LastLoginedAt     time.Time `json:"last_logined_at"`
+}
+
+type UserBadge struct {
+	ID      int64 `json:"id"`
+	UserID  int64 `json:"user_id"`
+	BadgeID int64 `json:"badge_id"`
 }
