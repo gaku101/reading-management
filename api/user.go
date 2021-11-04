@@ -188,7 +188,6 @@ func (server *Server) getUser(ctx *gin.Context) {
 	}
 
 	rsp := newUserResponse(user)
-
 	ctx.JSON(http.StatusOK, rsp)
 }
 

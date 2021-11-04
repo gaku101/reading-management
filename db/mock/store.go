@@ -651,10 +651,10 @@ func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // GetUserBadge mocks base method.
-func (m *MockStore) GetUserBadge(arg0 context.Context, arg1 int64) (db.Badge, error) {
+func (m *MockStore) GetUserBadge(arg0 context.Context, arg1 int64) (db.GetUserBadgeRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserBadge", arg0, arg1)
-	ret0, _ := ret[0].(db.Badge)
+	ret0, _ := ret[0].(db.GetUserBadgeRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -741,7 +741,7 @@ func (mr *MockStoreMockRecorder) ListComments(arg0, arg1 interface{}) *gomock.Ca
 }
 
 // ListEntries mocks base method.
-func (m *MockStore) ListEntries(arg0 context.Context, arg1 db.ListEntriesParams) ([]db.Entry, error) {
+func (m *MockStore) ListEntries(arg0 context.Context, arg1 int64) ([]db.Entry, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListEntries", arg0, arg1)
 	ret0, _ := ret[0].([]db.Entry)
