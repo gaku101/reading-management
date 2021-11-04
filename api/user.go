@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -168,8 +167,7 @@ type getUserRequest struct {
 }
 
 type getUserResponse struct {
-	User      userResponse `json:"user"`
-	UserBadge db.UserBadge `json:"userBadge"`
+	User userResponse `json:"user"`
 }
 
 func (server *Server) getUser(ctx *gin.Context) {
@@ -188,55 +186,8 @@ func (server *Server) getUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	entries, err := server.store.ListEntries(ctx, user.ID)
-	var total int
-	for i := range entries {
-		entry := entries[i]
-		total += int(entry.Amount)
-	}
-	fmt.Println("total\n", total)
-	userBadge, err := server.store.GetUserBadge(ctx, user.ID)
-	var updatedUserBadge db.UserBadge
-	if userBadge.BadgeID == 1 && total >= 5 {
-		updatedUserBadge, err = server.store.UpdateUserBadge(ctx, db.UpdateUserBadgeParams{
-			UserID:  user.ID,
-			BadgeID: 2,
-		})
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	} else if userBadge.BadgeID == 2 && total >= 200 {
-		updatedUserBadge, err = server.store.UpdateUserBadge(ctx, db.UpdateUserBadgeParams{
-			UserID:  user.ID,
-			BadgeID: 2,
-		})
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	} else if userBadge.BadgeID == 3 && total >= 500 {
-		updatedUserBadge, err = server.store.UpdateUserBadge(ctx, db.UpdateUserBadgeParams{
-			UserID:  user.ID,
-			BadgeID: 2,
-		})
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	} else {
-		updatedUserBadge = db.UserBadge{
-			ID: userBadge.ID,
-			UserID: user.ID,
-			BadgeID: userBadge.BadgeID,
-		}
-	}
 
-	rsp := getUserResponse{
-		User: newUserResponse(user),
-		UserBadge: updatedUserBadge,
-	}
-
+	rsp := newUserResponse(user)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
