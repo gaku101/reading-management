@@ -36,7 +36,7 @@ func (q *Queries) DeleteUserBadge(ctx context.Context, userID int64) error {
 }
 
 const getUserBadge = `-- name: GetUserBadge :one
-SELECT badge.id,
+SELECT badge.id, name, user_badge.id, user_id, badge_id,
   name
 FROM badge
   JOIN user_badge ON badge.id = badge_id
@@ -44,10 +44,26 @@ FROM badge
 LIMIT 1
 `
 
-func (q *Queries) GetUserBadge(ctx context.Context, userID int64) (Badge, error) {
+type GetUserBadgeRow struct {
+	ID      int64  `json:"id"`
+	Name    string `json:"name"`
+	ID_2    int64  `json:"id_2"`
+	UserID  int64  `json:"user_id"`
+	BadgeID int64  `json:"badge_id"`
+	Name_2  string `json:"name_2"`
+}
+
+func (q *Queries) GetUserBadge(ctx context.Context, userID int64) (GetUserBadgeRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserBadge, userID)
-	var i Badge
-	err := row.Scan(&i.ID, &i.Name)
+	var i GetUserBadgeRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ID_2,
+		&i.UserID,
+		&i.BadgeID,
+		&i.Name_2,
+	)
 	return i, err
 }
 

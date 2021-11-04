@@ -53,18 +53,11 @@ const listEntries = `-- name: ListEntries :many
 SELECT id, user_id, amount, created_at
 FROM entries
 WHERE user_id = $1
-ORDER BY id
-LIMIT $2 OFFSET $3
+  AND amount > 0
 `
 
-type ListEntriesParams struct {
-	UserID int64 `json:"user_id"`
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error) {
-	rows, err := q.db.QueryContext(ctx, listEntries, arg.UserID, arg.Limit, arg.Offset)
+func (q *Queries) ListEntries(ctx context.Context, userID int64) ([]Entry, error) {
+	rows, err := q.db.QueryContext(ctx, listEntries, userID)
 	if err != nil {
 		return nil, err
 	}

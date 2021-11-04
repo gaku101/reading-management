@@ -3,7 +3,7 @@ INSERT INTO user_badge (user_id, badge_id)
 VALUES ($1, $2)
 RETURNING *;
 -- name: GetUserBadge :one
-SELECT badge.id,
+SELECT *,
   name
 FROM badge
   JOIN user_badge ON badge.id = badge_id

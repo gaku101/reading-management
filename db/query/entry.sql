@@ -11,5 +11,4 @@ LIMIT 1;
 SELECT *
 FROM entries
 WHERE user_id = $1
-ORDER BY id
-LIMIT $2 OFFSET $3;
+  AND amount > 0;
