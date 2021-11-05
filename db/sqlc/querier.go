@@ -32,7 +32,6 @@ type Querier interface {
 	DeletePostFavorites(ctx context.Context, postID int64) error
 	DeleteUser(ctx context.Context, username string) error
 	DeleteUserBadge(ctx context.Context, userID int64) error
-	GetBadge(ctx context.Context, id int64) (Badge, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
 	GetComment(ctx context.Context, id int64) (Comment, error)
 	GetCommentsId(ctx context.Context, postID int64) ([]int64, error)
@@ -48,7 +47,6 @@ type Querier interface {
 	GetUserBadge(ctx context.Context, userID int64) (GetUserBadgeRow, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserImage(ctx context.Context, username string) (string, error)
-	ListBadges(ctx context.Context) ([]Badge, error)
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListComments(ctx context.Context, arg ListCommentsParams) ([]Comment, error)
 	ListEntries(ctx context.Context, userID int64) ([]Entry, error)
