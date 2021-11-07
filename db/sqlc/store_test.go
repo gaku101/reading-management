@@ -109,3 +109,49 @@ func TestTransferTx(t *testing.T) {
 	require.Equal(t, user1.Points-int64(n)*amount, updatedUser1.Points)
 	require.Equal(t, user2.Points+int64(n)*amount, updatedAccount2.Points)
 }
+
+func TestTransferTxDeadlock(t *testing.T) {
+	store := NewStore(testDB)
+
+	user1 := createRandomUser(t)
+	user2 := createRandomUser(t)
+	fmt.Println(">> before:", user1.Points, user2.Points)
+
+	n := 4
+	amount := int64(10)
+
+	errs := make(chan error)
+
+	for i := 0; i < n; i++ {
+		fromUserID := user1.ID
+		toUserID := user2.ID
+		if i%2 == 1 {
+			fromUserID = user2.ID
+			toUserID = user1.ID
+		}
+		go func() {
+			_, err := store.TransferTx(context.Background(), TransferTxParams{
+				FromUserID: fromUserID,
+				ToUserID:   toUserID,
+				Amount:     amount,
+			})
+			errs <- err
+		}()
+	}
+
+	for i := 0; i < n; i++ {
+		err := <-errs
+		require.NoError(t, err)
+	}
+	// check the final updated user's point
+	updatedUser1, err := store.GetUser(context.Background(), user1.Username)
+	require.NoError(t, err)
+
+	updatedAccount2, err := store.GetUser(context.Background(), user2.Username)
+	require.NoError(t, err)
+
+	fmt.Println(">> after:", updatedUser1.Points, updatedAccount2.Points)
+
+	require.Equal(t, user1.Points, updatedUser1.Points)
+	require.Equal(t, user2.Points, updatedAccount2.Points)
+}
