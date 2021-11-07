@@ -61,6 +61,7 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/posts/:id", server.deletePost)
 
 	authRoutes.POST("/category", server.createCategory)
+	authRoutes.GET("/category/:id", server.getCategory)
 	authRoutes.GET("/category", server.listCategories)
 
 	authRoutes.PUT("/post-category", server.updatePostCategory)
