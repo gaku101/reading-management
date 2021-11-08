@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"database/sql"
-
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -17,130 +16,14 @@ import (
 	"github.com/gaku101/my-portfolio/token"
 	"github.com/gaku101/my-portfolio/util"
 	"github.com/gin-gonic/gin"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetCategoryAPI(t *testing.T) {
+func TestCreateCommentAPI(t *testing.T) {
 	user, _ := randomUser(t)
-	category := randomCategory()
-
-	testCases := []struct {
-		name          string
-		categoryID    int64
-		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-		buildStubs    func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, recoder *httptest.ResponseRecorder)
-	}{
-		{
-			name:       "OK",
-			categoryID: category.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetCategory(gomock.Any(), gomock.Eq(category.ID)).
-					Times(1).
-					Return(category, nil)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchCategory(t, recorder.Body, category)
-			},
-		},
-		{
-			name:       "NoAuthorization",
-			categoryID: category.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetCategory(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusUnauthorized, recorder.Code)
-			},
-		},
-		{
-			name:       "NotFound",
-			categoryID: category.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-			},
-
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetCategory(gomock.Any(), gomock.Eq(category.ID)).
-					Times(1).
-					Return(db.Category{}, sql.ErrNoRows)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusNotFound, recorder.Code)
-			},
-		},
-		{
-			name:       "InternalError",
-			categoryID: category.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetCategory(gomock.Any(), gomock.Eq(category.ID)).
-					Times(1).
-					Return(db.Category{}, sql.ErrConnDone)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name:       "InvalidID",
-			categoryID: 0,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetCategory(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusBadRequest, recorder.Code)
-			},
-		},
-	}
-
-	for i := range testCases {
-		tc := testCases[i]
-
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			store := mockdb.NewMockStore(ctrl)
-			tc.buildStubs(store)
-
-			server := newTestServer(t, store)
-			recorder := httptest.NewRecorder()
-
-			url := fmt.Sprintf("/category/%d", tc.categoryID)
-			request, err := http.NewRequest(http.MethodGet, url, nil)
-			require.NoError(t, err)
-
-			tc.setupAuth(t, request, server.tokenMaker)
-			server.router.ServeHTTP(recorder, request)
-			tc.checkResponse(t, recorder)
-		})
-	}
-}
-
-func TestCreateCategoryAPI(t *testing.T) {
-	user, _ := randomUser(t)
-	category := randomCategory()
+	post := randomPost(user.Username)
+	comment := randomComment(post.Author, post.ID)
 
 	testCases := []struct {
 		name          string
@@ -152,34 +35,69 @@ func TestCreateCategoryAPI(t *testing.T) {
 		{
 			name: "OK",
 			body: gin.H{
-				"name": category.Name,
+				"postId": comment.PostID,
+				"body":   comment.Body,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				arg := category.Name
-
+				arg := db.CreateCommentParams{
+					Author: user.Username,
+					PostID: comment.PostID,
+					Body:   comment.Body,
+				}
 				store.EXPECT().
-					CreateCategory(gomock.Any(), gomock.Eq(arg)).
+					GetPost(gomock.Any(), gomock.Eq(post.ID)).
+					Times(1)
+				store.EXPECT().
+					CreateComment(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
-					Return(category, nil)
+					Return(comment, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchCategory(t, recorder.Body, category)
+				requireBodyMatchComment(t, recorder.Body, comment)
+			},
+		},
+		{
+			// When post.Author tries to comment on it's own post
+			name: "UnauthorizedUser",
+			body: gin.H{
+				"postId": comment.PostID,
+				"body":   comment.Body,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, post.Author, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetPost(gomock.Any(), gomock.Eq(post.ID)).
+					Times(1).
+					Return(post, nil)
+				arg := db.CreateCommentParams{
+					Author: "unauthorized_user",
+					PostID: comment.PostID,
+					Body:   comment.Body,
+				}
+				store.EXPECT().
+					CreateComment(gomock.Any(), gomock.Eq(arg)).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
 		{
 			name: "NoAuthorization",
 			body: gin.H{
-				"name": category.Name,
+				"body": comment.Body,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					CreateCategory(gomock.Any(), gomock.Any()).
+					CreateComment(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
@@ -189,36 +107,23 @@ func TestCreateCategoryAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
-				"name": category.Name,
+				"postId": comment.PostID,
+				"body":   comment.Body,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					CreateCategory(gomock.Any(), gomock.Any()).
+					GetPost(gomock.Any(), gomock.Eq(post.ID)).
+					Times(1)
+				store.EXPECT().
+					CreateComment(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.Category{}, sql.ErrConnDone)
+					Return(db.Comment{}, sql.ErrConnDone)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name: "InvalidName",
-			body: gin.H{
-				"name": 0,
-			},
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					CreateCategory(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 	}
@@ -240,7 +145,7 @@ func TestCreateCategoryAPI(t *testing.T) {
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/category"
+			url := "/comments"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 
@@ -251,44 +156,226 @@ func TestCreateCategoryAPI(t *testing.T) {
 	}
 }
 
-func TestListCategoriesAPI(t *testing.T) {
+func TestListCommentsAPI(t *testing.T) {
 	user, _ := randomUser(t)
+	post := randomPost(user.Username)
 
 	n := 5
-	categories := make([]db.Category, n)
+	comments := make([]db.Comment, n)
 	for i := 0; i < n; i++ {
-		categories[i] = randomCategory()
+		comments[i] = randomComment(post.Author, post.ID)
+	}
+
+	type Query struct {
+		pageID   int
+		pageSize int
 	}
 
 	testCases := []struct {
 		name          string
+		postId        int64
+		query         Query
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(recoder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			postId: post.ID,
+			query: Query{
+				pageID:   1,
+				pageSize: n,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.ListCommentsParams{
+					PostID: post.ID,
+					Limit:  int32(n),
+					Offset: 0,
+				}
+				store.EXPECT().
+					ListComments(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(comments, nil)
+				store.EXPECT().
+					GetUserImage(gomock.Any(), gomock.Eq(comments[0].Author)).
+					Times(n)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchComments(t, recorder.Body, comments)
+			},
+		},
+		{
+			name:   "NoAuthorization",
+			postId: post.ID,
+			query: Query{
+				pageID:   1,
+				pageSize: n,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListComments(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name:   "InternalError",
+			postId: post.ID,
+			query: Query{
+				pageID:   1,
+				pageSize: n,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListComments(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return([]db.Comment{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:   "InvalidPageID",
+			postId: post.ID,
+			query: Query{
+				pageID:   -1,
+				pageSize: n,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListComments(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "InvalidPageSize",
+			postId: post.ID,
+			query: Query{
+				pageID:   1,
+				pageSize: 100000,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListComments(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := newTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := fmt.Sprintf("/comments/%d", tc.postId)
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			// Add query parameters to request URL
+			q := request.URL.Query()
+			q.Add("page_id", fmt.Sprintf("%d", tc.query.pageID))
+			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			request.URL.RawQuery = q.Encode()
+
+			tc.setupAuth(t, request, server.tokenMaker)
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
+}
+
+func TestDeleteCommentAPI(t *testing.T) {
+	user, _ := randomUser(t)
+	post := randomPost(user.Username)
+	comment := randomComment(post.Author, post.ID)
+
+	testCases := []struct {
+		name          string
+		id            int64
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(recoder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
+			id:   comment.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					ListCategories(gomock.Any()).
+					GetComment(gomock.Any(), gomock.Eq(comment.ID)).
 					Times(1).
-					Return(categories, nil)
+					Return(comment, nil)
+				store.EXPECT().
+					DeleteComment(gomock.Any(), gomock.Eq(comment.ID)).
+					Times(1).
+					Return(nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchCategories(t, recorder.Body, categories)
+				requireBodyMatchComment(t, recorder.Body, comment)
+			},
+		},
+		{
+			name:   "UnauthorizedUser",
+			id: comment.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "UnauthorizedUser", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetComment(gomock.Any(), gomock.Eq(comment.ID)).
+					Times(1).
+					Return(comment, nil)
+				store.EXPECT().
+					DeleteComment(gomock.Any(), gomock.Eq(comment.ID)).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
 		{
 			name: "NoAuthorization",
+			id: comment.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					ListCategories(gomock.Any()).
+					DeleteComment(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
@@ -297,14 +384,19 @@ func TestListCategoriesAPI(t *testing.T) {
 		},
 		{
 			name: "InternalError",
+			id: comment.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					ListCategories(gomock.Any()).
+					GetComment(gomock.Any(), gomock.Eq(comment.ID)).
 					Times(1).
-					Return([]db.Category{}, sql.ErrConnDone)
+					Return(comment, nil)
+				store.EXPECT().
+					DeleteComment(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(sql.ErrConnDone)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -325,8 +417,8 @@ func TestListCategoriesAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := "/category"
-			request, err := http.NewRequest(http.MethodGet, url, nil)
+			url := fmt.Sprintf("/comments/%d", tc.id)
+			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 
 			tc.setupAuth(t, request, server.tokenMaker)
@@ -336,29 +428,31 @@ func TestListCategoriesAPI(t *testing.T) {
 	}
 }
 
-func randomCategory() db.Category {
-	return db.Category{
-		ID:   util.RandomInt(1, 1000),
-		Name: util.RandomString(6),
+func randomComment(author string, postId int64) db.Comment {
+	return db.Comment{
+		ID:     util.RandomInt(1, 1000),
+		Author: author,
+		PostID: postId,
+		Body:   util.RandomString(10),
 	}
 }
 
-func requireBodyMatchCategory(t *testing.T, body *bytes.Buffer, category db.Category) {
+func requireBodyMatchComment(t *testing.T, body *bytes.Buffer, comment db.Comment) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotCategory db.Category
-	err = json.Unmarshal(data, &gotCategory)
+	var gotComment db.Comment
+	err = json.Unmarshal(data, &gotComment)
 	require.NoError(t, err)
-	require.Equal(t, category, gotCategory)
+	require.Equal(t, comment, gotComment)
 }
 
-func requireBodyMatchCategories(t *testing.T, body *bytes.Buffer, categories []db.Category) {
+func requireBodyMatchComments(t *testing.T, body *bytes.Buffer, comments []db.Comment) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotCategories []db.Category
-	err = json.Unmarshal(data, &gotCategories)
+	var gotComments []db.Comment
+	err = json.Unmarshal(data, &gotComments)
 	require.NoError(t, err)
-	require.Equal(t, categories, gotCategories)
+	require.Equal(t, comments, gotComments)
 }

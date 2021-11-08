@@ -18,7 +18,7 @@ type commentResponse struct {
 	Body        string    `json:"body"`
 	CreatedAt   time.Time `json:"created_at"`
 	AuthorImage string    `json:"authorImage"`
-	PostID      int64     `json:"postId"`
+	PostID      int64     `json:"post_id"`
 }
 
 func newCommentResponse(comment db.Comment, authorImage string) commentResponse {
@@ -105,6 +105,7 @@ func (server *Server) listComments(ctx *gin.Context) {
 		Limit:  param.PageSize,
 		Offset: (param.PageID - 1) * param.PageSize,
 	}
+
 	comments, err := server.store.ListComments(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -170,4 +171,5 @@ func (server *Server) deleteComment(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	ctx.JSON(http.StatusOK, comment)
 }
