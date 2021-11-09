@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"reflect"
 
-	// "database/sql"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
