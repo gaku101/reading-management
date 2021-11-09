@@ -556,7 +556,6 @@ func randomUser(t *testing.T) (user db.User, password string) {
 		Username:       util.RandomUser(),
 		HashedPassword: hashedPassword,
 		Email:          util.RandomEmail(),
-		Image:          "https://my-portfolio-bucket-01.s3.ap-northeast-1.amazonaws.com/images/817X7DP7PrL._AC_SL1200_.jpg",
 	}
 	return
 }
