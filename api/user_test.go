@@ -457,7 +457,6 @@ func TestDeleteUserAPI(t *testing.T) {
 					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				fmt.Printf("recorder.Code %+v\n", recorder.Code)
 				require.Equal(t, http.StatusOK, recorder.Code)
 			},
 		},
