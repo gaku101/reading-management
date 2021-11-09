@@ -453,14 +453,14 @@ func TestDeleteUserAPI(t *testing.T) {
 				}
 				store.EXPECT().
 					DeleteUserTx(gomock.Any(), gomock.Eq(arg)).
-					Times(1)
+					Times(1).
+					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 			},
 		},
 		{
-			// When post.Author tries to comment on it's own post
 			name:     "UnauthorizedUser",
 			userName: user.Username,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
