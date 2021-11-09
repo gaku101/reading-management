@@ -457,7 +457,6 @@ func TestDeleteUserAPI(t *testing.T) {
 					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				requireBodyMatchUser(t, recorder.Body, user)
 			},
 		},
 		{
