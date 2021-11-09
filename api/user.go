@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -309,8 +310,9 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 
 	awsS3 := infrastructure.NewAwsS3()
 	err = awsS3.Delete(user.Image)
-	// if err != nil {
-	// 	ctx.JSON(400, gin.H{"message": err.Error()})
-	// }
+	fmt.Println("awsS3.Delete error", err)
+	if err != nil {
+		ctx.JSON(400, gin.H{"message": err.Error()})
+	}
 	ctx.JSON(http.StatusOK, user)
 }
