@@ -312,4 +312,5 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": err.Error()})
 	}
+	ctx.JSON(http.StatusOK, user)
 }
