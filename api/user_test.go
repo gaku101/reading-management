@@ -556,6 +556,7 @@ func randomUser(t *testing.T) (user db.User, password string) {
 		Username:       util.RandomUser(),
 		HashedPassword: hashedPassword,
 		Email:          util.RandomEmail(),
+		Image: util.RandomString(6),
 	}
 	return
 }
