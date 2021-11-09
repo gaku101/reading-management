@@ -307,10 +307,10 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 		return
 	}
 
-	awsS3 := infrastructure.NewAwsS3()
-	err = awsS3.Delete(user.Image)
-	if err != nil {
-		ctx.JSON(400, gin.H{"message": err.Error()})
-	}
+	// awsS3 := infrastructure.NewAwsS3()
+	// err = awsS3.Delete(user.Image)
+	// if err != nil {
+	// 	ctx.JSON(400, gin.H{"message": err.Error()})
+	// }
 	ctx.JSON(http.StatusOK, user)
 }
