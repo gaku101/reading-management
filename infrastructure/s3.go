@@ -92,8 +92,8 @@ func (a *AwsS3) Delete(url string) (err error) {
 		Bucket: aws.String(a.Config.Aws.S3.Bucket),
 		Key:    aws.String(a.Keys.Folder + "/" + fileName),
 	})
-	// if err != nil {
-	// 	return fmt.Errorf("failed to delete file, %v", err)
-	// }
+	if err != nil {
+		return fmt.Errorf("failed to delete file, %v", err)
+	}
 	return nil
 }
