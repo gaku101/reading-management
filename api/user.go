@@ -311,8 +311,8 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 	awsS3 := infrastructure.NewAwsS3()
 	err = awsS3.Delete(user.Image)
 	fmt.Println("awsS3.Delete error", err)
-	if err != nil {
-		ctx.JSON(400, gin.H{"message": err.Error()})
-	}
+	// if err != nil {
+	// 	ctx.JSON(400, gin.H{"message": err.Error()})
+	// }
 	ctx.JSON(http.StatusOK, user)
 }
