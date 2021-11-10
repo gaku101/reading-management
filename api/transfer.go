@@ -42,6 +42,7 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	arg := db.TransferTxParams{
