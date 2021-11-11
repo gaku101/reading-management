@@ -26,8 +26,8 @@ type postFavoriteResponse struct {
 	CommentsNum int         `json:"commentsNum"`
 }
 
-func newPostFavoriteResponse(post db.ListFavoritePostsRow, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
-	return postResponse{
+func newPostFavoriteResponse(post db.ListFavoritePostsRow, category db.Category, authorImage string, favorites int, commentsNum int) postRelatedResponse {
+	return postRelatedResponse{
 		Id:          post.ID,
 		Author:      post.Author,
 		Title:       post.Title,
@@ -110,7 +110,7 @@ func (server *Server) listFavoritePosts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	var response []postResponse
+	var response []postRelatedResponse
 	for i := range favoritePosts {
 		post := favoritePosts[i]
 		category, err := server.store.GetPostCategory(ctx, post.ID)

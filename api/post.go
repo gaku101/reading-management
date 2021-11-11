@@ -17,10 +17,21 @@ type postResponse struct {
 	Id           int64       `json:"id"`
 	Author       string      `json:"author"`
 	Title        string      `json:"title"`
-	BookAuthor   string      `json:"bookAuthor"`
-	BookImage    string      `json:"bookImage"`
-	BookPage     int16       `json:"bookPage"`
-	BookPageRead int16       `json:"bookPageRead"`
+	BookAuthor   string      `json:"book_author"`
+	BookImage    string      `json:"book_image"`
+	BookPage     int16       `json:"book_page"`
+	BookPageRead int16       `json:"book_page_read"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
+}
+type postRelatedResponse struct {
+	Id           int64       `json:"id"`
+	Author       string      `json:"author"`
+	Title        string      `json:"title"`
+	BookAuthor   string      `json:"book_author"`
+	BookImage    string      `json:"book_image"`
+	BookPage     int16       `json:"book_page"`
+	BookPageRead int16       `json:"book_page_read"`
 	Category     db.Category `json:"category"`
 	CreatedAt    time.Time   `json:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at"`
@@ -29,8 +40,8 @@ type postResponse struct {
 	CommentsNum  int         `json:"commentsNum"`
 }
 
-func newPostRelatedResponse(post db.Post, category db.Category, authorImage string, favorites int, commentsNum int) postResponse {
-	return postResponse{
+func newPostRelatedResponse(post db.Post, category db.Category, authorImage string, favorites int, commentsNum int) postRelatedResponse {
+	return postRelatedResponse{
 		Id:           post.ID,
 		Author:       post.Author,
 		Title:        post.Title,
@@ -187,7 +198,7 @@ func (server *Server) listMyPosts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	var response []postResponse
+	var response []postRelatedResponse
 	for i := range posts {
 		post := posts[i]
 		category, err := server.store.GetPostCategory(ctx, post.ID)
@@ -229,7 +240,7 @@ func (server *Server) listPosts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	var response []postResponse
+	var response []postRelatedResponse
 	for i := range posts {
 		post := posts[i]
 		category, err := server.store.GetPostCategory(ctx, post.ID)

@@ -506,7 +506,7 @@ func TestDeleteUserAPI(t *testing.T) {
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq(user.Username)).
 					Times(1).
-					Return(db.User{}, nil)
+					Return(user, nil)
 
 				arg := db.DeleteUserTxParams{
 					ID:       user.ID,
