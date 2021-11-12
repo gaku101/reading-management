@@ -35,6 +35,10 @@ func (server *Server) createFollow(ctx *gin.Context) {
 		FollowingID: req.FollowingID,
 		FollowerID:  user.ID,
 	}
+	if arg.FollowingID == arg.FollowerID {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 	follow, err := server.store.CreateFollow(ctx, arg)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -52,7 +56,7 @@ func (server *Server) createFollow(ctx *gin.Context) {
 }
 
 type getFollowRequest struct {
-	FollowongID int64 `uri:"followingId" binding:"required,min=1"`
+	FollowingID int64 `uri:"followingId" binding:"required,min=1"`
 }
 
 func (server *Server) getFollow(ctx *gin.Context) {
@@ -72,7 +76,7 @@ func (server *Server) getFollow(ctx *gin.Context) {
 		return
 	}
 	arg := db.GetFollowParams{
-		FollowingID: req.FollowongID,
+		FollowingID: req.FollowingID,
 		FollowerID:  user.ID,
 	}
 	follow, err := server.store.GetFollow(ctx, arg)
