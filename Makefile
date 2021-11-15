@@ -8,7 +8,7 @@ dropdb:
 	docker exec -it postgres12 dropdb my_portfolio
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/myportfolio?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/my_portfolio?sslmode=disable" -verbose up
 
 migrateup1:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/my_portfolio?sslmode=disable" -verbose up 1
