@@ -43,6 +43,7 @@ func (server *Server) setupRouter() {
 
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
+	router.POST("/badge", server.createBadge)
 
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
@@ -87,7 +88,6 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/notes", server.updateNote)
 	authRoutes.DELETE("/notes/:id", server.deleteNote)
 
-	authRoutes.POST("/badge", server.createBadge)
 	
 	authRoutes.GET("/user-badge/:username", server.getUserBadge)
 
