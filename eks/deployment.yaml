@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myportfolio-api-deployment
+  labels:
+    app: myportfolio-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myportfolio-api
+  template:
+    metadata:
+      labels:
+        app: myportfolio-api
+    spec:
+      containers:
+      - name: myportfolio-api
+        image: 989298484874.dkr.ecr.ap-northeast-1.amazonaws.com/myportfolio:5d7c245f0e7670586c42b615a8244368890fb037
+        ports:
+        - containerPort: 8080
