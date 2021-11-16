@@ -12,7 +12,9 @@ password: test01
 
 ## バージョン情報
 
-- go v1.16( `go.mod` の内容を参照してください)
+- go 1.16-alpine3.13
+- PostgreSQL 12-alpine
+- golang-migrate v4.14.1
 
 ---
 
