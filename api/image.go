@@ -27,6 +27,7 @@ func (server *Server) uploadImage(ctx *gin.Context) {
 	}
 	// Create S3 session
 	awsS3 := infrastructure.NewAwsS3()
+	fmt.Printf("awsS3 %+v", awsS3)
 
 	form, _ := ctx.MultipartForm()
 	files := form.File["file"]

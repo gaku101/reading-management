@@ -30,6 +30,7 @@ func NewAwsS3() *AwsS3 {
 		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
 		Profile: "default",
 	})
+	fmt.Printf("sess %+v", sess)
 	if err != nil {
 		panic(err)
 	}
