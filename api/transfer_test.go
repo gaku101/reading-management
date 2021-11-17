@@ -15,7 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-	// "github.com/gaku101/my-portfolio/util"
 )
 
 func TestTransferAPI(t *testing.T) {
