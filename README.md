@@ -16,6 +16,7 @@ https://reading-management.net でデプロイしたアプリを実際にご利�
 - ユーザーの削除
 - ポイントの獲得、他ユーザーへの送付
 - 獲得ポイントに基づくランク制度(プロフィールで現在のランクを確認)
+- プロフィール画像の変更(デプロイ環境でのバグを修正中)
 
 
 ## 検証用アカウント
@@ -51,8 +52,8 @@ password: test01
 ```
 @
 ├─ github
-│   └─ workflows
-├─ api
+│   └─ workflows　// github-actionsの設定ファイル
+├─ api // 各種API
 ├─ db
 │   ├─ migration
 │   ├─ mock
