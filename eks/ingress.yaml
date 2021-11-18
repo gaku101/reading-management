@@ -24,7 +24,7 @@ spec:
             name: myportfolio-api-service
             port:
               number: 80
-  # tls:
-  # - hosts:
-  #   - api.reading-management.net
-  #   secretName: myportfolio-api-cert
+  tls:
+  - hosts:
+    - api.reading-management.net
+    secretName: myportfolio-api-cert

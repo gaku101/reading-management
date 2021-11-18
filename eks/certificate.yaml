@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: reading-management
+spec:
+  secretName: reading-management.net
+  duration: 2160h
+  renewBefore: 360h
+  commonName: "*.reading-management.net"
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - reading-management.net
+  - "*.reading-management.net"
+  # Issuer references are always required.
+  issuerRef:
+    name: letsencrypt-issuer
+    kind: ClusterIssuer
