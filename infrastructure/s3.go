@@ -77,7 +77,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 
 	// Upload the file to S3.
 	result, err := a.Uploader.Upload(&s3manager.UploadInput{
-		ACL:         aws.String("public-read"),
+		ACL:         aws.String("public-read-write"),
 		Body:        file,
 		Bucket:      aws.String(a.Config.Aws.S3.Bucket),
 		ContentType: aws.String(contentType),
