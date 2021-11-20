@@ -28,7 +28,7 @@ type AwsS3URLs struct {
 
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
-	appConfig, err := util.LoadConfig(".")
+	appConfig, err := util.LoadConfig("../")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
