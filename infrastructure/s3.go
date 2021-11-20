@@ -3,13 +3,16 @@ package infrastructure
 import (
 	"errors"
 	"fmt"
+	"log"
 	"mime/multipart"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/gaku101/my-portfolio/util"
 )
 
 type AwsS3 struct {
@@ -25,6 +28,10 @@ type AwsS3URLs struct {
 
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
+	appConfig, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
 	// s3manager.Uploader を初期化
 	// sess, err := session.NewSessionWithOptions(session.Options{
 	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
@@ -35,9 +42,13 @@ func NewAwsS3() *AwsS3 {
 	// 	Credentials: credentials.NewSharedCredentials("", "default"),
 	// })
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
-		Profile:           "default",
-		SharedConfigState: session.SharedConfigEnable,
+		Config: aws.Config{Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
+			AccessKeyID:     appConfig.AWSAccessKeyID,
+			SecretAccessKey: appConfig.AWSSecretAccessKeyKey,
+		}),
+			Region: aws.String(config.Aws.S3.Region)},
+		// Profile:           "default",
+		// SharedConfigState: session.SharedConfigEnable,
 	}))
 	// if err != nil {
 	// 	panic(err)
