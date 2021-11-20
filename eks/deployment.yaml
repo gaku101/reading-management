@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: myportfolio-api
-        image: 989298484874.dkr.ecr.ap-northeast-1.amazonaws.com/myportfolio:b98e752b2fc8e66972ce17044f2064dce572d889
+        image: 989298484874.dkr.ecr.ap-northeast-1.amazonaws.com/myportfolio:latest
         ports:
         - containerPort: 8080
