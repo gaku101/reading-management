@@ -27,13 +27,14 @@ type AwsS3URLs struct {
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
 	// s3manager.Uploader を初期化
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
-			AccessKeyID:     config.Aws.S3.AccessKeyID,
-			SecretAccessKey: config.Aws.S3.SecretAccessKey,
-		}),
-			Region: aws.String(config.Aws.S3.Region)},
-	})
+	// sess, err := session.NewSessionWithOptions(session.Options{
+	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
+	// 	Profile: "github",
+	// })
+	sess, err := session.NewSession(&aws.Config{
+    Region:      aws.String(config.Aws.S3.Region),
+    Credentials: credentials.NewSharedCredentials("", "default"),
+})
 	if err != nil {
 		panic(err)
 	}
