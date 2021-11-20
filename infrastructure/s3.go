@@ -73,7 +73,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 
 	// Upload the file to S3.
 	result, err := a.Uploader.Upload(&s3manager.UploadInput{
-		ACL:         aws.String("public-read"),
+		// ACL:         aws.String("public-read"),
 		Body:        file,
 		Bucket:      aws.String(a.Config.Aws.S3.Bucket),
 		ContentType: aws.String(contentType),
@@ -81,7 +81,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("failed to upload file, %v", err)
+		return "", fmt.Errorf("failed to upload file to s3, %v", err)
 	}
 	return result.Location, nil
 }
