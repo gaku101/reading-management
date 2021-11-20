@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -31,13 +30,17 @@ func NewAwsS3() *AwsS3 {
 	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
 	// 	Profile: "github",
 	// })
-	sess, err := session.NewSession(&aws.Config{
-    Region:      aws.String(config.Aws.S3.Region),
-    Credentials: credentials.NewSharedCredentials("", "default"),
-})
-	if err != nil {
-		panic(err)
-	}
+	// sess, err := session.NewSession(&aws.Config{
+	// 	Region:      aws.String(config.Aws.S3.Region),
+	// 	Credentials: credentials.NewSharedCredentials("", "default"),
+	// })
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Profile:           "default",
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	return &AwsS3{
 		Config: config,
