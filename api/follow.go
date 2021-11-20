@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	db "github.com/gaku101/my-portfolio/db/sqlc"
@@ -36,7 +37,8 @@ func (server *Server) createFollow(ctx *gin.Context) {
 		FollowerID:  user.ID,
 	}
 	if arg.FollowingID == arg.FollowerID {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		err := errors.New("can not follow yourself")
+		ctx.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 	follow, err := server.store.CreateFollow(ctx, arg)
