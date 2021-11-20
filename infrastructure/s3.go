@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -36,13 +35,9 @@ func NewAwsS3() *AwsS3 {
 	// 	Credentials: credentials.NewSharedCredentials("", "default"),
 	// })
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
-			AccessKeyID:     config.Aws.S3.AccessKeyID,
-			SecretAccessKey: config.Aws.S3.SecretAccessKey,
-		}),
-			Region: aws.String(config.Aws.S3.Region)},
-		// Profile:           "default",
-		// SharedConfigState: session.SharedConfigEnable,
+		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
+		Profile:           "default",
+		SharedConfigState: session.SharedConfigEnable,
 	}))
 	// if err != nil {
 	// 	panic(err)
