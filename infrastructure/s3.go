@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -26,10 +27,14 @@ type AwsS3URLs struct {
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
 	// s3manager.Uploader を初期化
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
-		Profile: "github",
-	})
+	// sess, err := session.NewSessionWithOptions(session.Options{
+	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
+	// 	Profile: "github",
+	// })
+	sess, err := session.NewSession(&aws.Config{
+    Region:      aws.String(config.Aws.S3.Region),
+    Credentials: credentials.NewSharedCredentials("", "default"),
+})
 	if err != nil {
 		panic(err)
 	}
