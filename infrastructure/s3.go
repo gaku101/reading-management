@@ -28,7 +28,7 @@ func NewAwsS3() *AwsS3 {
 	// s3manager.Uploader を初期化
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
-		Profile: "default",
+		Profile: "github",
 	})
 	if err != nil {
 		panic(err)
