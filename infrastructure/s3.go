@@ -85,7 +85,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("failed to upload file to s3, %v", err)
+		return "", fmt.Errorf("failed to upload file to s3 bucket, %v", err)
 	}
 	return result.Location, nil
 }
