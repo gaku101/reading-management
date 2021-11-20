@@ -35,6 +35,7 @@ func NewAwsS3() *AwsS3 {
 	// 	Credentials: credentials.NewSharedCredentials("", "default"),
 	// })
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
 		Profile:           "default",
 		SharedConfigState: session.SharedConfigEnable,
 	}))
