@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"errors"
 	"fmt"
-	"log"
 	"mime/multipart"
 	"strings"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/gaku101/my-portfolio/util"
 )
 
 type AwsS3 struct {
@@ -28,10 +26,6 @@ type AwsS3URLs struct {
 
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
-	appConfig, err := util.LoadConfig("../")
-	if err != nil {
-		log.Fatal("cannot load config:", err)
-	}
 	// s3manager.Uploader を初期化
 	// sess, err := session.NewSessionWithOptions(session.Options{
 	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
@@ -43,8 +37,8 @@ func NewAwsS3() *AwsS3 {
 	// })
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
-			AccessKeyID:     appConfig.AWSAccessKeyID,
-			SecretAccessKey: appConfig.AWSSecretAccessKeyKey,
+			AccessKeyID:     config.Aws.S3.AccessKeyID,
+			SecretAccessKey: config.Aws.S3.SecretAccessKey,
 		}),
 			Region: aws.String(config.Aws.S3.Region)},
 		// Profile:           "default",
