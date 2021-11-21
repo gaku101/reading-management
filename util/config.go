@@ -14,6 +14,8 @@ type Config struct {
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
 	TokenSymmetricKey string `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	AwsAccessKeyID string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AwsSecretAccessKey string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
 }
 
 // LoadConfig reads configuration from file or environment variables
