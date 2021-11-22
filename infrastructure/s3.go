@@ -26,37 +26,18 @@ type AwsS3URLs struct {
 
 func NewAwsS3() *AwsS3 {
 	config := NewConfig()
-	// s3manager.Uploader を初期化
-	// sess, err := session.NewSessionWithOptions(session.Options{
-	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
-	// 	Profile: "github",
-	// })
-	// sess, err := session.NewSession(&aws.Config{
-	// 	Region:      aws.String(config.Aws.S3.Region),
-	// 	Credentials: credentials.NewSharedCredentials("", "default"),
-	// })
-	// sess := session.Must(session.NewSessionWithOptions(session.Options{
-	// 	Config:  aws.Config{Region: aws.String(config.Aws.S3.Region)},
-	// 	Profile:           "default",
-	// 	SharedConfigState: session.SharedConfigEnable,
-	// }))
-	// if err != nil {
-	// 	panic(err)
-	// }
-	fmt.Println("config.Aws.S3.AccessKeyID\n", config.Aws.S3.AccessKeyID)
-	fmt.Println("config.Aws.S3.SecretAccessKey\n", config.Aws.S3.SecretAccessKey)
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
+	sess, err := session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
-			// Access key ID と Secret Access Key は IAM から作成する。
-			// 一度作成した Access key ID の Secret Access Key は csv ファイルでダウンロードしていない場合は、
-			// 確認する手段がないので新しくアクセスキーを作成する必要がある。
 			Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
 				AccessKeyID:     config.Aws.S3.AccessKeyID,
 				SecretAccessKey: config.Aws.S3.SecretAccessKey,
 			}),
 			Region: aws.String(config.Aws.S3.Region),
 		},
-	}))
+	})
+	if err != nil {
+		panic(err)
+	}
 	return &AwsS3{
 		Config: config,
 		Keys: AwsS3URLs{
@@ -91,7 +72,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 
 	// Upload the file to S3.
 	result, err := a.Uploader.Upload(&s3manager.UploadInput{
-		ACL:         aws.String("public-read-write"),
+		ACL:         aws.String("public-read"),
 		Body:        file,
 		Bucket:      aws.String(a.Config.Aws.S3.Bucket),
 		ContentType: aws.String(contentType),
