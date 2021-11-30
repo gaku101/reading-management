@@ -86,7 +86,7 @@ func (a *AwsS3) Upload(file multipart.File, fileName string, extension string) (
 }
 func (a *AwsS3) Delete(url string) (err error) {
 	svc := a.Svc
-	// オブジェクトurlのファイル名の部分を取得
+	// get file name part of object url
 	arr1 := strings.Split(url, "/")
 	fileName := arr1[len(arr1)-1]
 

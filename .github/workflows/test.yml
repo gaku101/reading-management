@@ -12,18 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # サービスコンテナへのアクセスに使用されるラベル
+      # label using for accessing service container
       postgres:
-        # Docker Hub のイメージ
+        # Image of Docker Hub
         image: postgres:12
-        # postgres のパスワードを入力する
+        # env for postgres
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: my_portfolio
         ports:
           - 5432:5432
-        # postgres が起動するまで待機するようにヘルスチェックを設定する
+        # set up health check to wait starting postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Server serves HTTP requests for our banking service
+// Server serves HTTP requests for the service
 type Server struct {
 	config     util.Config
 	store      db.Store

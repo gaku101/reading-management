@@ -52,22 +52,7 @@ func (server *Server) uploadImage(ctx *gin.Context) {
 			ctx.JSON(400, gin.H{"message": err.Error()})
 		}
 		fmt.Printf("url %+v ", url)
-		// image, err := server.store.GetUserImage(ctx, req.Username)
-		// if err != nil {
-		// 	if err == sql.ErrNoRows {
-		// 		ctx.JSON(http.StatusNotFound, errorResponse(err))
-		// 		return
-		// 	}
 
-		// 	ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		// 	return
-		// }
-		// if url != image {
-		// 	err = awsS3.Delete(image)
-		// 	if err != nil {
-		// 		ctx.JSON(400, gin.H{"message": err.Error()})
-		// 	}
-		// }
 		arg := db.UpdateUserImageParams{
 			Username: req.Username,
 			Image:    url,
