@@ -15,8 +15,7 @@ spec:
         app: myportfolio-api
     spec:
       containers:
-       - name: myportfolio-api
-         image: 989298484874.dkr.ecr.ap-northeast-1.amazonaws.com/myportfolio:16478b10d2ddd2a78e6cdc3994874abcef482a75
-         ports:
+      - name: myportfolio-api
+        image: 989298484874.dkr.ecr.ap-northeast-1.amazonaws.com/myportfolio:16478b10d2ddd2a78e6cdc3994874abcef482a75
+        ports:
           - containerPort: 8080
-
