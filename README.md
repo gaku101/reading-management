@@ -1,6 +1,5 @@
 # my-portfolio(https://reading-management.net)
 作成中の読書管理アプリのバックエンド用リポジトリになります。  
-https://reading-management.net でデプロイしたアプリを実際にご利用頂けます(＊現在いくつかのバグを修正中です)。  
 フロントエンドのコードはhttps://github.com/gaku101/my-portfolio-front からご確認頂けます。  
 
 ### 主な機能
@@ -17,14 +16,6 @@ https://reading-management.net でデプロイしたアプリを実際にご利�
 - ポイントの獲得、他ユーザーへの送付
 - 獲得ポイントに基づくランク制度(プロフィールで現在のランクを確認)
 - プロフィール画像の変更
-
-＊現在その他機能追加やレスポンシブ対応などを行なっています。
-
-
-## 検証用アカウント
-
-id: testuser  
-password: test01
 
 ---
 
