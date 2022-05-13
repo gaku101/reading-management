@@ -1,4 +1,4 @@
-# my-portfolio(https://reading-management.net)
+# my-portfolio
 作成中の読書管理アプリのバックエンド用リポジトリになります。  
 フロントエンドのコードはhttps://github.com/gaku101/my-portfolio-front からご確認頂けます。  
 
